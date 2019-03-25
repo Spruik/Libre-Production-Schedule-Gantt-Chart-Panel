@@ -1,0 +1,1 @@
+# smart-factory-production-schedule-gantt-chart-panel
