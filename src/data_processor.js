@@ -42,8 +42,14 @@ function tailorData(data, rowCols) {
   //url for writing influxdb data
   const influxUrl = utils.influxHost + 'write?db=smart_factory'
 
+  //sort
+  if (data.length > 1) {
+    data = data.sort((a, b) => (a.production_line > b.production_line) ? -1 : (a.production_line < b.production_line) ? 1 : 0)
+  }
+  
   //make order_data and its dimensions
   let order_data = takeOfKeys(data)
+ 
   let order_dimensions = rowCols.reduce((arr, col) => {
     arr.push(col.text.toLowerCase())
     return arr
@@ -55,7 +61,6 @@ function tailorData(data, rowCols) {
     return arr
   }, [])
   lines = utils.findDistinct(lines)
-  lines = lines.sort()  
 
   //make line_data to match the dimension, which is expected by the chart option data
   let line_data = []
@@ -65,6 +70,7 @@ function tailorData(data, rowCols) {
     const item = [l[0] + ' | ' + l[1], l[2], i, line]
     line_data.push(item)
   }
+  
   let line_dimensions = ['SiteArea', 'Line', 'Index', 'ProductionLine']
 
   //add elems to the dimension, which are expected by the option
@@ -208,15 +214,17 @@ function takeOfKeys(data) {
  */
 function categoriseByLineAndDate(data, key, obj){
   let result = []
+
+  console.log(data);
   
   for (let i = 0; i < data.length; i++) {
     const elem = data[i];
     const objdata = obj[i]
-     
+    
     let dates = obj.filter(d => d.production_line === objdata.production_line).map(d => d.order_date)
     dates = Array.from(new Set(dates))
     const dateIndex = findIndex(objdata.order_date, dates)
-
+    
     if (result[objdata.index]) {
       if (result[objdata.index][dateIndex]) {
         result[objdata.index][dateIndex].push(elem)

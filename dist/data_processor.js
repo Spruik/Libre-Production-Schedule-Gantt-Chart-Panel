@@ -49,8 +49,16 @@ System.register(['./utils', 'moment'], function (_export, _context) {
     //url for writing influxdb data
     var influxUrl = utils.influxHost + 'write?db=smart_factory';
 
+    //sort
+    if (data.length > 1) {
+      data = data.sort(function (a, b) {
+        return a.production_line > b.production_line ? -1 : a.production_line < b.production_line ? 1 : 0;
+      });
+    }
+
     //make order_data and its dimensions
     var order_data = takeOfKeys(data);
+
     var order_dimensions = rowCols.reduce(function (arr, col) {
       arr.push(col.text.toLowerCase());
       return arr;
@@ -62,7 +70,6 @@ System.register(['./utils', 'moment'], function (_export, _context) {
       return arr;
     }, []);
     lines = utils.findDistinct(lines);
-    lines = lines.sort();
 
     //make line_data to match the dimension, which is expected by the chart option data
     var line_data = [];
@@ -72,6 +79,7 @@ System.register(['./utils', 'moment'], function (_export, _context) {
       var item = [l[0] + ' | ' + l[1], l[2], i, line];
       line_data.push(item);
     }
+
     var line_dimensions = ['SiteArea', 'Line', 'Index', 'ProductionLine'];
 
     //add elems to the dimension, which are expected by the option
@@ -223,6 +231,8 @@ System.register(['./utils', 'moment'], function (_export, _context) {
    */
   function categoriseByLineAndDate(data, key, obj) {
     var result = [];
+
+    console.log(data);
 
     var _loop2 = function _loop2(i) {
       var elem = data[i];

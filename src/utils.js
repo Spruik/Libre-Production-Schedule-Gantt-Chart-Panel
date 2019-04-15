@@ -106,3 +106,37 @@ export function findDistinct(arr){
 export function getLineStartTime(line){
   return '6:00:00'
 }
+
+export function highlightColor(hexColor){
+  const rgb = hexToRgb(hexColor)
+  rgb.r >= 235 ? rgb.r = 255 : rgb.r += 20
+  rgb.g >= 235 ? rgb.g = 255 : rgb.g += 20
+  rgb.b >= 235 ? rgb.b = 255 : rgb.b += 20
+  return rgbToHex(rgb.r, rgb.g, rgb.b)
+}
+
+function rgbToHex(r, g, b){
+  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b)
+}
+
+function hexToRgb(hex) {
+  let shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+  hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+      return r + r + g + g + b + b;
+  });
+
+  let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+  } : null;
+}
+
+function componentToHex(c){
+  let hex = c.toString(16)
+  return hex.length === 1 ? "0" + hex : hex;
+}
+
+
+

@@ -169,6 +169,7 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
 
         var status = api.value(dp.findIndex('status', _rawData.order.dimensions));
         var color = dp.getColor(status);
+        var highlightColor = utils.highlightColor(color);
 
         var categoryIndex = api.value(DIM_CATEGORY_INDEX);
         var timeArrival = api.coord([api.value(DIM_TIME_ARRIVAL), categoryIndex]);
@@ -206,12 +207,14 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
                 type: 'rect',
                 ignore: !rectNormal,
                 shape: rectNormal,
-                style: api.style({ fill: color })
+                style: api.style({ fill: color }),
+                styleEmphasis: { fill: highlightColor }
             }, {
                 type: 'rect',
                 ignore: !rectVIP && !api.value(4),
                 shape: rectVIP,
-                style: api.style({ fill: color })
+                style: api.style({ fill: color }),
+                styleEmphasis: { fill: highlightColor }
             }, {
                 type: 'rect',
                 ignore: !rectText,
@@ -322,7 +325,7 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
         myChart.on('mousedown', function (param) {
             // console.log(param.event.offsetX);
 
-            if (!_draggable || !param || param.seriesIndex == null) {
+            if (!_draggable || !param || param.seriesIndex === null) {
                 return;
             }
             // Drag start

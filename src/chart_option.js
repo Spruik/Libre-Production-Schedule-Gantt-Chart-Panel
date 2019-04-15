@@ -196,7 +196,8 @@ export function getOption (data, ) {
 function renderGanttItem(params, api) {
   
   let status = api.value(dp.findIndex('status', _rawData.order.dimensions))
-  let color = dp.getColor(status)
+  const color = dp.getColor(status)
+  const highlightColor = utils.highlightColor(color)
   
   var categoryIndex = api.value(DIM_CATEGORY_INDEX);
   var timeArrival = api.coord([api.value(DIM_TIME_ARRIVAL), categoryIndex]);
@@ -235,13 +236,17 @@ function renderGanttItem(params, api) {
           type: 'rect',
           ignore: !rectNormal,
           shape: rectNormal,
-          style: api.style({fill: color})
-      }, {
+          style: api.style({fill: color}),
+          styleEmphasis: {fill: highlightColor}
+      }, 
+      {
           type: 'rect',
           ignore: !rectVIP && !api.value(4),
           shape: rectVIP,
-          style: api.style({fill: color})
-      }, {
+          style: api.style({fill: color}),
+          styleEmphasis: {fill: highlightColor}
+      }, 
+      {
           type: 'rect',
           ignore: !rectText,
           shape: rectText,
@@ -352,7 +357,7 @@ function initDrag(myChart){
   myChart.on('mousedown', function (param) {
     // console.log(param.event.offsetX);
     
-    if (!_draggable || !param || param.seriesIndex == null) {
+    if (!_draggable || !param || param.seriesIndex === null) {
       return;
     }
     // Drag start
