@@ -1,0 +1,76 @@
+<div class="modal-body">
+        <div class="modal-header">
+          <h2 class="modal-header-title">
+            <i class="fa fa-info-circle"></i>
+            <span class="p-l-1">Insertion Actions</span>
+          </h2>
+      
+          <a class="modal-header-close" id="product-schedule-gantt-chart-drop-insert-actions-close-btn" ng-click="dismiss();">
+            <i class="fa fa-remove"></i>
+          </a>
+        </div>
+      
+        <form class="form" name="product-schedule-gantt-chart-drop-insert-actions-form">
+          <div
+            class="modal-content"
+            id="modal-modal-content"
+            style="max-height:600px; overflow-y:scroll"
+          >
+            <div class="text-center">
+
+              <div>
+                <p style="font-size : 13px">Inserting the dragging order <strong style="font-weight: 600; font-size: 16px">{{model.droppingOrder.order_id}}</strong> to sit before or after target the order <strong style="font-weight: 600; font-size: 16px">{{model.targetOrder.order_id}}</strong></p>
+              </div>
+
+              <div class="radio-tile-group">
+                <!-- Before -->
+                <div class="input-container">
+                  <input
+                    id="before"
+                    class="radio-button"
+                    type="radio"
+                    name="product-schedule-gantt-chart-drop-insert-actions-radio"
+                  />
+                  <div class="radio-tile">
+                    <div class="icon edit-icon">
+                      <i class="fa fa-arrow-left fa-2x"></i>
+                    </div>
+                    <label for="before" class="radio-tile-label">Before</label>
+                  </div>
+                </div>
+                <!-- After -->
+                <div class="input-container">
+                  <input
+                    id="after"
+                    class="radio-button"
+                    type="radio"
+                    name="product-schedule-gantt-chart-drop-insert-actions-radio"
+                  />
+                  <div class="radio-tile">
+                    <div class="icon edit-icon">
+                      <i class="fa fa-arrow-right fa-2x"></i>
+                    </div>
+                    <label for="after" class="radio-tile-label">After</label>
+                  </div>
+                </div>
+                <!-- Cancel -->
+                <div class="input-container">
+                  <input
+                    id="cancel"
+                    class="radio-button"
+                    type="radio"
+                    name="product-schedule-gantt-chart-drop-insert-actions-radio"
+                  />
+                  <div class="radio-tile">
+                    <div class="icon edit-icon">
+                      <i class="fa fa-times fa-2x"></i>
+                    </div>
+                    <label for="cancel" class="radio-tile-label">Cancel</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      
