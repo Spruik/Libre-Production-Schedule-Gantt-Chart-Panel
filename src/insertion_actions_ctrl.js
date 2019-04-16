@@ -218,7 +218,7 @@ function insertOrder(inputValues, allData){
     //successful
     closeForm()
     utils.alert('success', 'Successful', 'Order has been successfully inserted')
-    chart.refreshPanel()
+    chart.refreshDashboard()
   }).catch(e => {
     //error
     utils.alert('error', 'Error', 'An error occurred when inserting the order : ' + e)

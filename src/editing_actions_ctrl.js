@@ -150,7 +150,6 @@ function updateOrder(inputValues){
     return
   }
   
-  //there is no order yet on the line on that date, check for tags changes then update
   if (isTagsChanged(inputValues)) {
 
     updateOldAndNewOrders(inputValues)
@@ -163,8 +162,12 @@ function updateOrder(inputValues){
       //coz it is changing line, so just simply remove the start time and end time
       updateWithRemoving(inputValues)
     }else{
-      //save the order directly with changing its starttime and endtime
-      updateWithChanging(inputValues)
+      if (isDateChanged(inputValues)) {
+        updateWithRemoving(inputValues)
+      }else{
+        //save the order directly with changing its starttime and endtime
+        updateWithChanging(inputValues)
+      }
     }
   }
 }
@@ -180,7 +183,7 @@ function getOrdersBeingAffect(allData, inputValues){
   return ordersInOriginalLineAndDate.filter(order => {
     let endTime = moment(inputValues.endTime)
     return order.startTime >= endTime.valueOf()
-          && order.order_date === inputValues.date
+          && order.order_date === _targetOrder.order_date
   })
 }
 
@@ -237,7 +240,7 @@ function updateWithRemoving(inputValues){
     }else {
       closeForm()
       utils.alert('success', 'Successful', 'Order has been successfully updated')
-      chart.refreshPanel()
+      chart.refreshDashboard()
     }
   }).catch(e => {
     closeForm()
@@ -281,6 +284,7 @@ function updateWithChanging(inputValues) {
  */
 function updateAffectedOrders(inputValues, difference) {
   let promises = []
+
   _ordersBeingAffected.forEach(order => {
     const line = influx.writeLineForTimeUpdate(order, difference, 'subtract')
     const prom = utils.post(influx.writeUrl, line)
@@ -289,7 +293,7 @@ function updateAffectedOrders(inputValues, difference) {
   Promise.all(promises).then(res => {
     closeForm()
     utils.alert('success', 'Successful', 'Order has been successfully updated')
-    chart.refreshPanel()
+    chart.refreshDashboard()
   }).catch(e => {
     closeForm()
     utils.alert('error', 'Error', 'An error occurred when updated the order : ' + e)
@@ -317,7 +321,11 @@ function updateOldAndNewOrders(inputValues){
     if (isLineChanged(inputValues)) {
       updateWithRemoving(inputValues)
     }else {
-      updateWithChanging(inputValues)
+      if (isDateChanged(inputValues)) {
+        updateWithRemoving(inputValues)
+      }else{
+        updateWithChanging(inputValues)
+      }
     }
   }).catch(e => {
     closeForm()

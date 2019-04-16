@@ -20,6 +20,7 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
   function showForm(droppingOrder, targetOrder) {
     _droppingOrder = droppingOrder;
     _targetOrder = targetOrder;
+    _droppingOrder.targeting_date = _targetOrder.order_date;
 
     //show form
     utils.showModal('drop_insert_actions.html', { droppingOrder: droppingOrder, targetOrder: targetOrder });
@@ -59,33 +60,46 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
       return;
     }
 
+    //find original affected orders (orders that are after the dropping order in the ori line)
+    //then find targetting affected orders (orders that are after the place that the dropping order is going to take)
+    var originalLineAffectedOrders = findAffectedOrdersInLineChangedCase(allData, _droppingOrder, true);
+    var targetingLineAffectedOrders = findAffectedOrdersInLineChangedCase(allData, _targetOrder, false);
+
     if (isLineChanged(_droppingOrder, _targetOrder)) {
-      //find original affected orders (orders that are after the dropping order in the ori line)
-      //then find targetting affected orders (orders that are after the place that the dropping order is going to take)
-      var originalLineAffectedOrders = findAffectedOrdersInLineChangedCase(allData, _droppingOrder, true);
-      var targetingLineAffectedOrders = findAffectedOrdersInLineChangedCase(allData, _targetOrder, false);
 
       updateForLineChangedCase(originalLineAffectedOrders, targetingLineAffectedOrders, droppingTotalDuration);
     } else {
-      //line didn't change
-      //need to know if the dragging order is moving forward or backward
-      var ordersAffected = findAffectedOrders(allData, _droppingOrder, _targetOrder, isMovingForward(_droppingOrder, _targetOrder));
+      if (isDateChanged(_droppingOrder, _targetOrder)) {
+        //......
+        updateForLineChangedCase(originalLineAffectedOrders, targetingLineAffectedOrders, droppingTotalDuration);
+        //......
+      } else {
+        //line didn't change
+        //need to know if the dragging order is moving forward or backward
+        var ordersAffected = findAffectedOrders(allData, _droppingOrder, _targetOrder, isMovingForward(_droppingOrder, _targetOrder));
 
-      //if orders affected === 0, meaning that the targeting position is next the dropping position
-      //and the user insert the dropping order to the same direction where the dropping order is in
-      if (ordersAffected.length === 0) {
-        var dir = _isInsertingBefore ? "before " : "after ";
-        var text = "Order " + _droppingOrder.order_id + " is already " + dir + "the order " + _targetOrder.order_id;
-        utils.alert('warning', 'Warning', text);
-        return;
+        //if orders affected === 0, meaning that the targeting position is next the dropping position
+        //and the user insert the dropping order to the same direction where the dropping order is in
+        if (ordersAffected.length === 0) {
+          if (_droppingOrder.order_date === _targetOrder.order_date) {
+            var dir = _isInsertingBefore ? "before " : "after ";
+            var text = "Order " + _droppingOrder.order_id + " is already " + dir + "the order " + _targetOrder.order_id;
+            utils.alert('warning', 'Warning', text);
+            return;
+          }
+        }
+
+        //get duration
+        var affectedOrdersTotalDuration = getTotalOrderDuration(ordersAffected);
+
+        //start update orders to influxdb
+        update(isMovingForward(_droppingOrder, _targetOrder), droppingTotalDuration, affectedOrdersTotalDuration, ordersAffected);
       }
-
-      //get duration
-      var affectedOrdersTotalDuration = getTotalOrderDuration(ordersAffected);
-
-      //start update orders to influxdb
-      update(isMovingForward(_droppingOrder, _targetOrder), droppingTotalDuration, affectedOrdersTotalDuration, ordersAffected);
     }
+  }
+
+  function isDateChanged(droppingOrder, targetOrder) {
+    return droppingOrder.order_date !== targetOrder.order_date;
   }
 
   function updateForLineChangedCase(oriOrders, targOrders, dropDur) {
@@ -137,7 +151,7 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
     if (targOrders.length === 0) {
       closeForm();
       utils.alert('success', 'Successful', 'Order has been successfully updated');
-      chart.refreshPanel();
+      chart.refreshDashboard();
     }
     //then target affected +++++ dropping dur
     var promises = [];
@@ -148,7 +162,7 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
     Promise.all(promises).then(function (res) {
       closeForm();
       utils.alert('success', 'Successful', 'Order has been successfully updated');
-      chart.refreshPanel();
+      chart.refreshDashboard();
     }).catch(function (e) {
       closeForm();
       utils.alert('error', 'Error', 'An error occurred when updated the order : ' + e);
@@ -197,7 +211,7 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
     Promise.all(promise).then(function (res) {
       closeForm();
       utils.alert('success', 'Successful', 'Order has been successfully updated');
-      chart.refreshPanel();
+      chart.refreshDashboard();
     }).catch(function (e) {
       closeForm();
       utils.alert('error', 'Error', 'An error occurred when updated the order : ' + e);

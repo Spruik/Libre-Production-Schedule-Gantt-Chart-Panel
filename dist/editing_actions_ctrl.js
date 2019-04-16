@@ -155,7 +155,6 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
       return;
     }
 
-    //there is no order yet on the line on that date, check for tags changes then update
     if (isTagsChanged(inputValues)) {
 
       updateOldAndNewOrders(inputValues);
@@ -167,8 +166,12 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
         //coz it is changing line, so just simply remove the start time and end time
         updateWithRemoving(inputValues);
       } else {
-        //save the order directly with changing its starttime and endtime
-        updateWithChanging(inputValues);
+        if (isDateChanged(inputValues)) {
+          updateWithRemoving(inputValues);
+        } else {
+          //save the order directly with changing its starttime and endtime
+          updateWithChanging(inputValues);
+        }
       }
     }
   }
@@ -185,7 +188,7 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
     });
     return ordersInOriginalLineAndDate.filter(function (order) {
       var endTime = moment(inputValues.endTime);
-      return order.startTime >= endTime.valueOf() && order.order_date === inputValues.date;
+      return order.startTime >= endTime.valueOf() && order.order_date === _targetOrder.order_date;
     });
   }
 
@@ -248,7 +251,7 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
       } else {
         closeForm();
         utils.alert('success', 'Successful', 'Order has been successfully updated');
-        chart.refreshPanel();
+        chart.refreshDashboard();
       }
     }).catch(function (e) {
       closeForm();
@@ -292,6 +295,7 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
    */
   function updateAffectedOrders(inputValues, difference) {
     var promises = [];
+
     _ordersBeingAffected.forEach(function (order) {
       var line = influx.writeLineForTimeUpdate(order, difference, 'subtract');
       var prom = utils.post(influx.writeUrl, line);
@@ -300,7 +304,7 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
     Promise.all(promises).then(function (res) {
       closeForm();
       utils.alert('success', 'Successful', 'Order has been successfully updated');
-      chart.refreshPanel();
+      chart.refreshDashboard();
     }).catch(function (e) {
       closeForm();
       utils.alert('error', 'Error', 'An error occurred when updated the order : ' + e);
@@ -328,7 +332,11 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
       if (isLineChanged(inputValues)) {
         updateWithRemoving(inputValues);
       } else {
-        updateWithChanging(inputValues);
+        if (isDateChanged(inputValues)) {
+          updateWithRemoving(inputValues);
+        } else {
+          updateWithChanging(inputValues);
+        }
       }
     }).catch(function (e) {
       closeForm();

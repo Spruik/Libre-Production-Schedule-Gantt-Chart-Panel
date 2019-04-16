@@ -1,5 +1,6 @@
 import * as utils from './utils'
 import moment from 'moment'
+import * as chartCtrl from './chart_ctrl'
 
 let _order_data
 let _order_dimensions
@@ -96,7 +97,6 @@ function tailorData(data, rowCols) {
       const dateGroup = lineGroup[c];
       let _startTime = 0
       
-
       //filter out two groups, one is with startTime initalised, one is not.
       const STkey = 'scheduled_start_datetime'
       const dateGroupWithTime = dateGroup.filter(order => order[findIndex(STkey, order_dimensions)] !== null && order[findIndex(STkey, order_dimensions)] !== undefined)
@@ -179,10 +179,14 @@ function tailorData(data, rowCols) {
     }
   }
 
-  //do nothing if requests are successful, popup the error if failed.
-  Promise.all(promises).then().catch(e => {
-    utils.alert('error', 'Influxdb Error', 'An error occurred while updating data : ' + e)
-  })
+  if (promises.length > 0) {
+    //do nothing if requests are successful, popup the error if failed.
+    Promise.all(promises).then(res => {
+      chartCtrl.refreshDashb()
+    }).catch(e => {
+      utils.alert('error', 'Influxdb Error', 'An error occurred while updating data : ' + e)
+    })
+  }
 
   //set order data and its dimension global because it will be required later from other files
   _order_data = order_data
@@ -214,8 +218,6 @@ function takeOfKeys(data) {
  */
 function categoriseByLineAndDate(data, key, obj){
   let result = []
-
-  console.log(data);
   
   for (let i = 0; i < data.length; i++) {
     const elem = data[i];

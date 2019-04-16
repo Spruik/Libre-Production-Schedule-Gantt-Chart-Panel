@@ -117,8 +117,6 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
                 dimensions: _rawData.order.dimensions,
                 tooltip: {
                     formatter: function formatter(params) {
-                        // console.log(params);
-                        // console.log(_rawData.order.dimensions);
 
                         var startTime = moment(params.data[1]).format('YYYY-MM-DD H:mm:ss');
                         var endTime = moment(params.data[2]).format('YYYY-MM-DD H:mm:ss');
@@ -313,11 +311,11 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
 
     _export('interationSetup', interationSetup);
 
-    function refreshPanel() {
-        _panelCtrl.refresh();
+    function refreshDashboard() {
+        _panelCtrl.timeSrv.refreshDashboard();
     }
 
-    _export('refreshPanel', refreshPanel);
+    _export('refreshDashboard', refreshDashboard);
 
     function initDrag(myChart) {
         _autoDataZoomAnimator = makeAnimator(dispatchDataZoom);

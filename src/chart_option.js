@@ -145,8 +145,6 @@ export function getOption (data, ) {
         dimensions: _rawData.order.dimensions,
         tooltip: {
             formatter: params => {
-                // console.log(params);
-                // console.log(_rawData.order.dimensions);
                 
                 const startTime = moment(params.data[1]).format('YYYY-MM-DD H:mm:ss')
                 const endTime = moment(params.data[2]).format('YYYY-MM-DD H:mm:ss')
@@ -347,8 +345,8 @@ export function interationSetup(myChart, panelCtrl){
   initDrag(myChart)
 }
 
-export function refreshPanel(){
-  _panelCtrl.refresh()
+export function refreshDashboard(){
+  _panelCtrl.timeSrv.refreshDashboard()
 }
 
 function initDrag(myChart){

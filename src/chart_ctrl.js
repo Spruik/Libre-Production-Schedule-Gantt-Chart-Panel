@@ -11,6 +11,8 @@ import './css/style.css!'
 import './css/bootstrap-slider.css!'
 import './css/instant-search.css!'
 
+let _ctrl
+
 const panelDefaults = {
   targets: [{}],
   pageSize: null,
@@ -99,6 +101,7 @@ export class ChartCtrl extends MetricsPanelCtrl {
   link(scope, elem, attrs, ctrl) {
     const $panelContainer = elem.find('#production-schedule-gantt-chart')[0];
     const myChart = echarts.init($panelContainer)
+    _ctrl = ctrl
     
     function renderPanel(data) { 
       if (!myChart || !data) { return; }
@@ -133,6 +136,10 @@ export class ChartCtrl extends MetricsPanelCtrl {
     });
   }
 
+}
+
+export function refreshDashb(){
+  _ctrl.timeSrv.refreshDashboard()
 }
 
 ChartCtrl.templateUrl = 'partials/module.html';

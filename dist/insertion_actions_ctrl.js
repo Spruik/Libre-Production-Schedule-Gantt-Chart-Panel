@@ -225,7 +225,7 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
       //successful
       closeForm();
       utils.alert('success', 'Successful', 'Order has been successfully inserted');
-      chart.refreshPanel();
+      chart.refreshDashboard();
     }).catch(function (e) {
       //error
       utils.alert('error', 'Error', 'An error occurred when inserting the order : ' + e);

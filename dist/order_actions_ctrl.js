@@ -64,7 +64,7 @@ System.register(['./utils', './influx_helper', './insertion_actions_ctrl', './ed
       utils.post(influx.writeUrl, line).then(function (res) {
         utils.alert('success', 'Success', 'Order has been marked as ' + status);
         closeForm();
-        chart.refreshPanel();
+        chart.refreshDashboard();
       }).catch(function (e) {
         utils.alert('error', 'Database Error', 'An error occurred while updating the order : ' + e);
         closeForm();
@@ -99,7 +99,7 @@ System.register(['./utils', './influx_helper', './insertion_actions_ctrl', './ed
     Promise.all(promises).then(function () {
       utils.alert('success', 'Success', 'Order has been marked as Deleted');
       closeForm();
-      chart.refreshPanel();
+      chart.refreshDashboard();
     }).catch(function (e) {
       utils.alert('error', 'Database Error', 'An error occurred while deleting the order : ' + e);
       closeForm();

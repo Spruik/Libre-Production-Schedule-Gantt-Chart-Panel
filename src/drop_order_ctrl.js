@@ -14,6 +14,7 @@ const closeForm = () => $('a#product-schedule-gantt-chart-drop-insert-actions-cl
 export function showForm(droppingOrder, targetOrder) {
   _droppingOrder = droppingOrder
   _targetOrder = targetOrder
+  _droppingOrder.targeting_date = _targetOrder.order_date
 
   //show form
   utils.showModal('drop_insert_actions.html', {droppingOrder: droppingOrder, targetOrder: targetOrder})
@@ -51,15 +52,21 @@ function insert(){
     return
   }
 
-  if (isLineChanged(_droppingOrder, _targetOrder)) {
-    //find original affected orders (orders that are after the dropping order in the ori line)
-    //then find targetting affected orders (orders that are after the place that the dropping order is going to take)
-    const originalLineAffectedOrders = findAffectedOrdersInLineChangedCase(allData, _droppingOrder, true)
-    const targetingLineAffectedOrders = findAffectedOrdersInLineChangedCase(allData, _targetOrder, false)
+  //find original affected orders (orders that are after the dropping order in the ori line)
+  //then find targetting affected orders (orders that are after the place that the dropping order is going to take)
+  const originalLineAffectedOrders = findAffectedOrdersInLineChangedCase(allData, _droppingOrder, true)
+  const targetingLineAffectedOrders = findAffectedOrdersInLineChangedCase(allData, _targetOrder, false)
 
+  if (isLineChanged(_droppingOrder, _targetOrder)) {
+    
     updateForLineChangedCase(originalLineAffectedOrders, targetingLineAffectedOrders, droppingTotalDuration)
     
   }else {
+    if (isDateChanged(_droppingOrder, _targetOrder)) {
+      //......
+      updateForLineChangedCase(originalLineAffectedOrders, targetingLineAffectedOrders, droppingTotalDuration)
+      //......
+    }else{
     //line didn't change
     //need to know if the dragging order is moving forward or backward
     const ordersAffected = findAffectedOrders(allData, _droppingOrder ,_targetOrder, isMovingForward(_droppingOrder, _targetOrder))
@@ -67,10 +74,12 @@ function insert(){
     //if orders affected === 0, meaning that the targeting position is next the dropping position
     //and the user insert the dropping order to the same direction where the dropping order is in
     if (ordersAffected.length === 0) {
-      const dir = _isInsertingBefore ? "before " : "after "
-      const text = "Order " + _droppingOrder.order_id + " is already " + dir + "the order " + _targetOrder.order_id      
-      utils.alert('warning', 'Warning', text)
-      return
+      if (_droppingOrder.order_date === _targetOrder.order_date) {
+        const dir = _isInsertingBefore ? "before " : "after "
+        const text = "Order " + _droppingOrder.order_id + " is already " + dir + "the order " + _targetOrder.order_id      
+        utils.alert('warning', 'Warning', text)
+        return
+      }
     }
 
     //get duration
@@ -78,8 +87,12 @@ function insert(){
 
     //start update orders to influxdb
     update(isMovingForward(_droppingOrder, _targetOrder), droppingTotalDuration, affectedOrdersTotalDuration, ordersAffected)
-
+    }
   }
+}
+
+function isDateChanged(droppingOrder, targetOrder){
+  return droppingOrder.order_date !== targetOrder.order_date
 }
 
 function updateForLineChangedCase(oriOrders, targOrders, dropDur){
@@ -132,7 +145,7 @@ function updateTargetOrdersForLineChangedCase(targOrders, dropDur){
   if (targOrders.length === 0) {
     closeForm()
     utils.alert('success', 'Successful', 'Order has been successfully updated')
-    chart.refreshPanel()
+    chart.refreshDashboard()
   }
   //then target affected +++++ dropping dur
   let promises = []
@@ -143,7 +156,7 @@ function updateTargetOrdersForLineChangedCase(targOrders, dropDur){
   Promise.all(promises).then(res => {
     closeForm()
     utils.alert('success', 'Successful', 'Order has been successfully updated')
-    chart.refreshPanel()
+    chart.refreshDashboard()
   }).catch(e => {
     closeForm()
     utils.alert('error', 'Error', 'An error occurred when updated the order : ' + e)
@@ -192,7 +205,7 @@ function updateAffectedOrders(affectedOrders, droppingDur, isMovingForward){
   Promise.all(promise).then(res => {
     closeForm()
     utils.alert('success', 'Successful', 'Order has been successfully updated')
-    chart.refreshPanel()
+    chart.refreshDashboard()
   }).catch(e => {
     closeForm()
     utils.alert('error', 'Error', 'An error occurred when updated the order : ' + e)

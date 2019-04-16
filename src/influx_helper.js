@@ -186,7 +186,7 @@ export function writeLineForUpdateDragging(data, startTime, endTime, targLine) {
   }
 
   line += 'order_state="' + data.status + '"' + ','
-  line += 'order_date="' + data.order_date + '"' + ','
+  line += 'order_date="' + data.targeting_date + '"' + ','
   line += 'planned_changeover_time="' + data.planned_changeover_time + '"' + ','
   line += 'production_line="' + targLine + '"' + ','
   line += 'order_qty=' + data.order_qty + ','

@@ -66,7 +66,7 @@ function updateOrderStatus(status){
     utils.post(influx.writeUrl, line).then(res => {
       utils.alert('success', 'Success', 'Order has been marked as ' + status)
       closeForm()
-      chart.refreshPanel()
+      chart.refreshDashboard()
     }).catch(e => {
       utils.alert('error', 'Database Error', 'An error occurred while updating the order : ' + e)
       closeForm()
@@ -100,7 +100,7 @@ function deleteCurrentAndUpdateAffectOrders(line){
   Promise.all(promises).then(() => {
     utils.alert('success', 'Success', 'Order has been marked as Deleted')
     closeForm()
-    chart.refreshPanel()
+    chart.refreshDashboard()
   }).catch(e => {
     utils.alert('error', 'Database Error', 'An error occurred while deleting the order : ' + e)
     closeForm()

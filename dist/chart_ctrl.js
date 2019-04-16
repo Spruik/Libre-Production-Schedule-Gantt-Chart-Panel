@@ -3,7 +3,7 @@
 System.register(['angular', 'lodash', 'jquery', './data_processor', './chart_option', './utils', './libs/echarts.min', 'app/plugins/sdk', './css/style.css!', './css/bootstrap-slider.css!', './css/instant-search.css!'], function (_export, _context) {
   "use strict";
 
-  var angular, _, $, dp, chart, utils, echarts, MetricsPanelCtrl, _createClass, _get, panelDefaults, ChartCtrl;
+  var angular, _, $, dp, chart, utils, echarts, MetricsPanelCtrl, _createClass, _get, _ctrl, panelDefaults, ChartCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -34,6 +34,12 @@ System.register(['angular', 'lodash', 'jquery', './data_processor', './chart_opt
     });
     if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
   }
+
+  function refreshDashb() {
+    _ctrl.timeSrv.refreshDashboard();
+  }
+
+  _export('refreshDashb', refreshDashb);
 
   return {
     setters: [function (_angular) {
@@ -97,6 +103,7 @@ System.register(['angular', 'lodash', 'jquery', './data_processor', './chart_opt
         }
       };
 
+      _ctrl = void 0;
       panelDefaults = {
         targets: [{}],
         pageSize: null,
@@ -193,6 +200,7 @@ System.register(['angular', 'lodash', 'jquery', './data_processor', './chart_opt
           value: function link(scope, elem, attrs, ctrl) {
             var $panelContainer = elem.find('#production-schedule-gantt-chart')[0];
             var myChart = echarts.init($panelContainer);
+            _ctrl = ctrl;
 
             function renderPanel(data) {
               if (!myChart || !data) {

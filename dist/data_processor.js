@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['./utils', 'moment'], function (_export, _context) {
+System.register(['./utils', 'moment', './chart_ctrl'], function (_export, _context) {
   "use strict";
 
-  var utils, moment, _order_data, _order_dimensions;
+  var utils, moment, chartCtrl, _order_data, _order_dimensions;
 
   /**
    * Expecting columns names, and rows values
@@ -196,10 +196,14 @@ System.register(['./utils', 'moment'], function (_export, _context) {
       }
     }
 
-    //do nothing if requests are successful, popup the error if failed.
-    Promise.all(promises).then().catch(function (e) {
-      utils.alert('error', 'Influxdb Error', 'An error occurred while updating data : ' + e);
-    });
+    if (promises.length > 0) {
+      //do nothing if requests are successful, popup the error if failed.
+      Promise.all(promises).then(function (res) {
+        chartCtrl.refreshDashb();
+      }).catch(function (e) {
+        utils.alert('error', 'Influxdb Error', 'An error occurred while updating data : ' + e);
+      });
+    }
 
     //set order data and its dimension global because it will be required later from other files
     _order_data = order_data;
@@ -231,8 +235,6 @@ System.register(['./utils', 'moment'], function (_export, _context) {
    */
   function categoriseByLineAndDate(data, key, obj) {
     var result = [];
-
-    console.log(data);
 
     var _loop2 = function _loop2(i) {
       var elem = data[i];
@@ -349,6 +351,8 @@ System.register(['./utils', 'moment'], function (_export, _context) {
       utils = _utils;
     }, function (_moment) {
       moment = _moment.default;
+    }, function (_chart_ctrl) {
+      chartCtrl = _chart_ctrl;
     }],
     execute: function () {
       _order_data = void 0;
