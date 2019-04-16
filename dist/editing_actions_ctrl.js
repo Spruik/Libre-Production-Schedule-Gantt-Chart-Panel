@@ -5,6 +5,18 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
 
   var utils, influx, dp, instant_search, moment, chart, _targetOrder, _ordersBeingAffected, _tryCatchCounter, _products, _equipment, closeForm;
 
+  function _toConsumableArray(arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
+        arr2[i] = arr[i];
+      }
+
+      return arr2;
+    } else {
+      return Array.from(arr);
+    }
+  }
+
   /**
    * Show edition order form
    * @param {*} targetOrder The order that the user want to make edition on
@@ -137,10 +149,8 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
     //the orders that are in the original line that this order was in and that are being affected because this order changes line
     var ordersBeingAffected = getOrdersBeingAffect(allData, inputValues);
     _ordersBeingAffected = ordersBeingAffected;
-    //the time (in milsec format) that has already been taken for the line and date that this order is going to
-    var timeAlreadyTaken = getTimeAlreadyTaken(allData, inputValues);
 
-    if (isOver24Hours(timeAlreadyTaken, inputValues)) {
+    if (!isLineHavingSpareTimeForTheDay(allData, inputValues, _targetOrder)) {
       utils.alert('warning', 'Warning', "There is no spare space for this order to fit in this date's schedule");
       return;
     }
@@ -161,35 +171,6 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
         updateWithChanging(inputValues);
       }
     }
-  }
-
-  /**
-   * The alldata and the user input the calculate the time in the line that the editing order is going to go to
-   * return the total time that has been taken.
-   * @param {*} allData All the orders that is being passed in and displayed in this panel
-   * @param {*} inputValues Inputs that the user entered in this order edition form
-   */
-  function getTimeAlreadyTaken(allData, inputValues) {
-    var ordersWithSameLineAndDate = allData.filter(function (order) {
-      return order.production_line === inputValues.productionLine && order.order_date === inputValues.date;
-    });
-    var ordersThatCount = ordersWithSameLineAndDate.filter(function (order) {
-      return order.order_id !== _targetOrder.order_id;
-    });
-
-    if (ordersThatCount.length === 0) {
-      return 0;
-    }
-
-    var sumOfTime = 0;
-    ordersThatCount.forEach(function (order) {
-      var changeover = moment.duration(order.planned_changeover_time, 'H:mm:ss');
-      var duration = moment.duration(order.order_qty / order.planned_rate, 'hours');
-      var total = changeover.add(duration).valueOf();
-      sumOfTime += total;
-    });
-
-    return sumOfTime;
   }
 
   /**
@@ -215,6 +196,41 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
    */
   function isLineChanged(inputValues) {
     return inputValues.productionLine !== _targetOrder.production_line;
+  }
+
+  function isLineHavingSpareTimeForTheDay(allData, inputValues, targetOrder) {
+
+    //all orders in the targeting line (except the editing order itself (if line not changed))
+    var affectedOrders = allData.filter(function (order) {
+      return order.production_line === inputValues.productionLine && order.order_date === inputValues.date;
+    });
+    affectedOrders = affectedOrders.filter(function (order) {
+      return order.order_id !== targetOrder.order_id;
+    });
+
+    //find the line's default start time and then plus next day
+    var targetDayStartTime = moment(moment(inputValues.date, 'YYYY-MM-DD').format('YYYY-MM-DD') + ' ' + utils.getLineStartTime(targetOrder.production_line), 'YYYY-MM-DD H:mm:ss');
+    var targetDayStartTimeText = targetDayStartTime.format('YYYY-MM-DD H:mm:ss');
+    var nextDayStartTime = moment(targetDayStartTimeText, 'YYYY-MM-DD H:mm:ss').add(1, 'days');
+
+    //calc edited order's duration
+    var duration = moment.duration(inputValues.orderQty / inputValues.plannedRate, 'hours');
+    var changeover = moment.duration(inputValues.changeover, 'H:mm:ss');
+    var totalDur = duration.add(changeover);
+
+    //if no affected orders, see if target dat start time + totaldur <= nextdatstarttime
+    if (affectedOrders.length === 0) {
+      return targetDayStartTime.add(totalDur).isSameOrBefore(nextDayStartTime);
+    }
+
+    //get the max end time
+    var all_end_times = affectedOrders.map(function (order) {
+      return order.endTime;
+    });
+    var maxEndTime = moment(Math.max.apply(Math, _toConsumableArray(all_end_times)));
+    maxEndTime.add(totalDur);
+
+    return maxEndTime.isSameOrBefore(nextDayStartTime);
   }
 
   /**
@@ -318,21 +334,6 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
       closeForm();
       utils.alert('error', 'Error', 'An error occurred when updated the order : ' + e);
     });
-  }
-
-  /**
-   * Check if the order is over 24 hours, return true if it is.
-   * @param {*} time The total time that has already been taken on that line and that date
-   */
-  function isOver24Hours(time, inputValues) {
-    var hours24 = moment.duration(24, 'hours').valueOf();
-
-    var duration = moment.duration(inputValues.orderQty / inputValues.plannedRate, 'hours');
-    var changeover = moment.duration(inputValues.changeover, 'H:mm:ss');
-    var totalDur = duration.add(changeover);
-    var totalTime = time + totalDur.valueOf();
-
-    return totalTime > hours24;
   }
 
   /**

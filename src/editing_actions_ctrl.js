@@ -144,10 +144,8 @@ function updateOrder(inputValues){
   //the orders that are in the original line that this order was in and that are being affected because this order changes line
   const ordersBeingAffected = getOrdersBeingAffect(allData, inputValues)  
   _ordersBeingAffected = ordersBeingAffected
-  //the time (in milsec format) that has already been taken for the line and date that this order is going to
-  const timeAlreadyTaken = getTimeAlreadyTaken(allData, inputValues)
 
-  if (isOver24Hours(timeAlreadyTaken, inputValues)) {
+  if (!isLineHavingSpareTimeForTheDay(allData, inputValues, _targetOrder)) {
     utils.alert('warning', 'Warning', "There is no spare space for this order to fit in this date's schedule")
     return
   }
@@ -172,29 +170,6 @@ function updateOrder(inputValues){
 }
 
 /**
- * The alldata and the user input the calculate the time in the line that the editing order is going to go to
- * return the total time that has been taken.
- * @param {*} allData All the orders that is being passed in and displayed in this panel
- * @param {*} inputValues Inputs that the user entered in this order edition form
- */
-function getTimeAlreadyTaken(allData, inputValues){
-  const ordersWithSameLineAndDate = allData.filter(order => order.production_line === inputValues.productionLine && order.order_date === inputValues.date)
-  const ordersThatCount = ordersWithSameLineAndDate.filter(order => order.order_id !== _targetOrder.order_id)
-
-  if (ordersThatCount.length === 0) { return 0 }
-
-  let sumOfTime = 0
-  ordersThatCount.forEach(order => {
-    const changeover = moment.duration(order.planned_changeover_time, 'H:mm:ss')
-    const duration = moment.duration((order.order_qty / order.planned_rate), 'hours')
-    const total = changeover.add(duration).valueOf()
-    sumOfTime += total
-  })
-
-  return sumOfTime
-}
-
-/**
  * get alldata and the user input to filter all affected orders.
  * These orders will be the ones that are in the original line with the same date.
  * @param {*} allData All the orders that is being passed in and displayed in this panel
@@ -216,6 +191,35 @@ function getOrdersBeingAffect(allData, inputValues){
  */
 function isLineChanged(inputValues){
   return inputValues.productionLine !== _targetOrder.production_line
+}
+
+function isLineHavingSpareTimeForTheDay(allData, inputValues, targetOrder){
+    
+  //all orders in the targeting line (except the editing order itself (if line not changed))
+  let affectedOrders = allData.filter(order => order.production_line === inputValues.productionLine && order.order_date === inputValues.date)
+  affectedOrders = affectedOrders.filter(order => order.order_id !== targetOrder.order_id)
+
+  //find the line's default start time and then plus next day
+  const targetDayStartTime = moment(moment(inputValues.date, 'YYYY-MM-DD').format('YYYY-MM-DD') + ' ' + utils.getLineStartTime(targetOrder.production_line), 'YYYY-MM-DD H:mm:ss')
+  const targetDayStartTimeText = targetDayStartTime.format('YYYY-MM-DD H:mm:ss')
+  const nextDayStartTime = moment(targetDayStartTimeText, 'YYYY-MM-DD H:mm:ss').add(1, 'days')
+
+  //calc edited order's duration
+  const duration = moment.duration(inputValues.orderQty / inputValues.plannedRate, 'hours')
+  const changeover = moment.duration(inputValues.changeover, 'H:mm:ss')
+  const totalDur = duration.add(changeover)
+
+  //if no affected orders, see if target dat start time + totaldur <= nextdatstarttime
+  if (affectedOrders.length === 0) {
+    return targetDayStartTime.add(totalDur).isSameOrBefore(nextDayStartTime) 
+  }
+
+  //get the max end time
+  const all_end_times = affectedOrders.map(order => order.endTime)
+  const maxEndTime = moment(Math.max(...all_end_times)) 
+  maxEndTime.add(totalDur)
+
+  return maxEndTime.isSameOrBefore(nextDayStartTime)
 }
 
 /**
@@ -319,21 +323,6 @@ function updateOldAndNewOrders(inputValues){
     closeForm()
     utils.alert('error', 'Error', 'An error occurred when updated the order : ' + e)
   })
-}
-
-/**
- * Check if the order is over 24 hours, return true if it is.
- * @param {*} time The total time that has already been taken on that line and that date
- */
-function isOver24Hours(time, inputValues){
-  const hours24 = moment.duration(24,'hours').valueOf()
-
-  const duration = moment.duration(inputValues.orderQty / inputValues.plannedRate, 'hours')
-  const changeover = moment.duration(inputValues.changeover, 'H:mm:ss')
-  const totalDur = duration.add(changeover)
-  const totalTime = time + totalDur.valueOf()
-  
-  return totalTime > hours24
 }
 
 /**

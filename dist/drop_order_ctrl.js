@@ -5,6 +5,18 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
 
   var utils, influx, dp, instant_search, moment, chart, _isInsertingBefore, _droppingOrder, _targetOrder, closeForm;
 
+  function _toConsumableArray(arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) {
+        arr2[i] = arr[i];
+      }
+
+      return arr2;
+    } else {
+      return Array.from(arr);
+    }
+  }
+
   function showForm(droppingOrder, targetOrder) {
     _droppingOrder = droppingOrder;
     _targetOrder = targetOrder;
@@ -37,20 +49,17 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
   }
 
   function insert() {
-    //if is over 24?
     var allData = dp.getData();
-    var timeAlreadyTaken = getTimeAlreadyTaken(allData, _targetOrder);
-
-    if (isOver24Hours(timeAlreadyTaken, _droppingOrder)) {
-      utils.alert('warning', 'Warning', "There is no spare space for this order to fit in this date's schedule");
-      return;
-    }
 
     //get dropping order's total duration
     var droppingTotalDuration = getOrderDuration(_droppingOrder);
 
+    if (!isLineHavingSpareTimeForTheDay(allData, droppingTotalDuration, _targetOrder)) {
+      utils.alert('warning', 'Warning', "There is no spare space for this order to fit in this date's schedule");
+      return;
+    }
+
     if (isLineChanged(_droppingOrder, _targetOrder)) {
-      //line changed
       //find original affected orders (orders that are after the dropping order in the ori line)
       //then find targetting affected orders (orders that are after the place that the dropping order is going to take)
       var originalLineAffectedOrders = findAffectedOrdersInLineChangedCase(allData, _droppingOrder, true);
@@ -107,7 +116,6 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
   }
 
   function updateOriginOrdersForLineChangedCase(oriOrders, dropDur, targOrders) {
-    //then ori affected ----- dropping dur
     if (oriOrders.length === 0) {
       updateTargetOrdersForLineChangedCase(targOrders, dropDur);
     }
@@ -218,12 +226,25 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
     return duration;
   }
 
+  /**
+   * Return the order's original start time
+   * Oringal start time === The order's actual start time - the order's changeover
+   * @param {*} order The order needed to be calculated
+   */
   function getInitStartTime(order) {
     var startTime = moment(order.startTime);
     var changeover = moment.duration(order.planned_changeover_time, 'H:mm:ss');
     return startTime.subtract(changeover);
   }
 
+  /**
+   * This is for the case that the dropping order is dropped to another production line
+   * Find affected orders for dropping line or targeting line based on the last param passed in.
+   * Return the affected orders.
+   * @param {*} allData All orders
+   * @param {*} order The dropping order || or the targeting order
+   * @param {*} isOriginal Is finding affected orders for the original line(true)? or the targeting line(false)?
+   */
   function findAffectedOrdersInLineChangedCase(allData, order, isOriginal) {
     var ordersWithSameLineAndDate = allData.filter(function (or) {
       return or.production_line === order.production_line && or.order_date === order.order_date;
@@ -239,6 +260,14 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
     return ordersBeingAffected;
   }
 
+  /**
+   * This is for the case that the dropping order is dropped on the same line
+   * Return the affected orders
+   * @param {*} allData All orders
+   * @param {*} droppingOrder The dropping order
+   * @param {*} targetingOrder The order the dropping order is dropped on
+   * @param {*} isMovingForward Is the dropping order going forward?
+   */
   function findAffectedOrders(allData, droppingOrder, targetingOrder, isMovingForward) {
     var ordersWithSameLineAndDate = allData.filter(function (order) {
       return order.production_line === targetingOrder.production_line && order.order_date === targetingOrder.order_date;
@@ -264,55 +293,51 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
     return ordersBeingAffected;
   }
 
+  /**
+   * Check if the dropping order and the target order is in the same line
+   * Return true if they are NOT in a same line
+   * @param {*} droppingOrder The order the user is dropping
+   * @param {*} targetingOrder The order the dropping order is dropped on
+   */
   function isLineChanged(droppingOrder, targetingOrder) {
     return droppingOrder.production_line !== targetingOrder.production_line;
   }
 
+  /**
+   * Return true if the dropping order has gone forward, otherwise false.
+   * @param {*} droppingOrder The dropping order
+   * @param {*} targetOrder The order that the dropping order is dropped on
+   */
   function isMovingForward(droppingOrder, targetOrder) {
     return droppingOrder.startTime < targetOrder.startTime;
   }
 
   /**
-   * Check if the order is over 24 hours, return true if it is.
-   * @param {*} time The total time that has already been taken on that line and that date
+   * Check if the targeting line on that date has spare space for the dropping order to fit in
+   * Return true if there is space for the dropping order, otherwise false.
+   * @param {*} allData The orders
+   * @param {*} droppingTotalDuration The dropping order
+   * @param {*} targetOrder The order that the dropping order is dropped on
    */
-  function isOver24Hours(time, droppingOrder) {
-    var hours24 = moment.duration(24, 'hours').valueOf();
+  function isLineHavingSpareTimeForTheDay(allData, droppingTotalDuration, targetOrder) {
 
-    var duration = moment.duration(droppingOrder.order_qty / droppingOrder.planned_rate, 'hours');
-    var changeover = moment.duration(droppingOrder.planned_changeover_time, 'H:mm:ss');
-    var totalDur = duration.add(changeover);
-    var totalTime = time + totalDur.valueOf();
-
-    return totalTime > hours24;
-  }
-
-  /**
-   * The alldata and the user input the calculate the time in the line that the editing order is going to go to
-   * return the total time that has been taken.
-   * @param {*} allData All the orders that is being passed in and displayed in this panel
-   */
-  function getTimeAlreadyTaken(allData, targetOrder) {
-    var ordersWithSameLineAndDate = allData.filter(function (order) {
+    //all orders in the targeting line
+    var affectedOrders = allData.filter(function (order) {
       return order.production_line === targetOrder.production_line && order.order_date === targetOrder.order_date;
     });
-    var ordersThatCount = ordersWithSameLineAndDate.filter(function (order) {
-      return order.order_id !== _droppingOrder.order_id;
+    //get the max end time
+    var all_end_times = affectedOrders.map(function (order) {
+      return order.endTime;
     });
+    var maxEndTime = moment(Math.max.apply(Math, _toConsumableArray(all_end_times)));
+    //find the line's default start time and then plus next day
+    var targetDay = moment(targetOrder.order_date, 'YYYY-MM-DD');
+    var nextDay = targetDay.add(1, 'days').format('YYYY-MM-DD');
+    var nextDayStartTime = moment(nextDay + ' ' + utils.getLineStartTime(targetOrder.production_line), 'YYYY-MM-DD H:mm:ss');
+    //maxtime + dropping dura to calc the final max time
+    maxEndTime.add(droppingTotalDuration);
 
-    if (ordersThatCount.length === 0) {
-      return 0;
-    }
-
-    var sumOfTime = 0;
-    ordersThatCount.forEach(function (order) {
-      var changeover = moment.duration(order.planned_changeover_time, 'H:mm:ss');
-      var duration = moment.duration(order.order_qty / order.planned_rate, 'hours');
-      var total = changeover.add(duration).valueOf();
-      sumOfTime += total;
-    });
-
-    return sumOfTime;
+    return maxEndTime.isSameOrBefore(nextDayStartTime);
   }
   return {
     setters: [function (_utils) {
