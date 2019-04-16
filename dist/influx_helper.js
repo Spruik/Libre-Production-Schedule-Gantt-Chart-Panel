@@ -39,7 +39,8 @@ System.register(['./utils', 'moment'], function (_export, _context) {
     line += 'order_qty=' + data.order_qty + ',';
     line += 'planned_rate=' + data.planned_rate;
 
-    //   console.log(line);
+    // console.log('writeLineForUpdate');
+    // console.log(line);
     return line;
   }
 
@@ -63,6 +64,7 @@ System.register(['./utils', 'moment'], function (_export, _context) {
     line += 'setpoint_rate=' + 0 + ',';
     line += 'planned_rate=' + data.plannedRate;
 
+    // console.log('writeLineForCreate');
     // console.log(line);
     return line;
   }
@@ -124,7 +126,8 @@ System.register(['./utils', 'moment'], function (_export, _context) {
     line += 'scheduled_start_datetime=' + startTime + ',';
     line += 'planned_rate=' + data.planned_rate;
 
-    //   console.log(line);
+    // console.log('writeLineForTimeUpdate');
+    // console.log(line);
     return line;
   }
 
@@ -146,6 +149,8 @@ System.register(['./utils', 'moment'], function (_export, _context) {
     line += 'setpoint_rate=' + 0 + ',';
     line += 'planned_rate=' + data.plannedRate;
 
+    // console.log('writeLineForUpdateWithRemovingTime');
+    // console.log(line);
     return line;
   }
 
@@ -169,6 +174,8 @@ System.register(['./utils', 'moment'], function (_export, _context) {
     line += 'setpoint_rate=' + 0 + ',';
     line += 'planned_rate=' + data.plannedRate;
 
+    // console.log('writeLineForUpdateWithChangingTime');
+    // console.log(line);
     return line;
   }
 
@@ -203,6 +210,8 @@ System.register(['./utils', 'moment'], function (_export, _context) {
     line += 'setpoint_rate=' + 0 + ',';
     line += 'planned_rate=' + data.planned_rate;
 
+    // console.log('writeLineForUpdateDragging');
+    // console.log(line);
     return line;
   }
 

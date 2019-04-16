@@ -38,7 +38,8 @@ export function writeLineForUpdate (status, data) {
   line += 'order_qty=' + data.order_qty + ','
   line += 'planned_rate=' + data.planned_rate
 
-  //   console.log(line);
+  // console.log('writeLineForUpdate');
+  // console.log(line);
   return line
 }
 
@@ -60,6 +61,7 @@ export function writeLineForCreate (data) {
   line += 'setpoint_rate=' + 0 + ','
   line += 'planned_rate=' + data.plannedRate
 
+  // console.log('writeLineForCreate');
   // console.log(line);
   return line
 }
@@ -122,7 +124,8 @@ export function writeLineForTimeUpdate (data, timeDiff, action) {
   line += 'scheduled_start_datetime=' + startTime + ','
   line += 'planned_rate=' + data.planned_rate
 
-  //   console.log(line);
+  // console.log('writeLineForTimeUpdate');
+  // console.log(line);
   return line
 }
 
@@ -142,6 +145,8 @@ export function writeLineForUpdateWithRemovingTime (data, currentStatus) {
   line += 'setpoint_rate=' + 0 + ','
   line += 'planned_rate=' + data.plannedRate
 
+  // console.log('writeLineForUpdateWithRemovingTime');
+  // console.log(line);
   return line
 }
 
@@ -163,6 +168,8 @@ export function writeLineForUpdateWithChangingTime (data, currentStatus, startTi
   line += 'setpoint_rate=' + 0 + ','
   line += 'planned_rate=' + data.plannedRate
 
+  // console.log('writeLineForUpdateWithChangingTime');
+  // console.log(line);
   return line
 }
 
@@ -195,6 +202,8 @@ export function writeLineForUpdateDragging(data, startTime, endTime, targLine) {
   line += 'setpoint_rate=' + 0 + ','
   line += 'planned_rate=' + data.planned_rate
 
+  // console.log('writeLineForUpdateDragging');
+  // console.log(line);
   return line
 }
 
