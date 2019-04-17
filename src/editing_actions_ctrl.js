@@ -57,9 +57,6 @@ function tryInitialisingForm(){
 }
 
 function initialiseForm(){
-  //init the instant search function
-  instant_search.enableInstantSearch(_products, _equipment)
-
   //init datepicker
   $('#datepicker').datepicker({
     orientation: 'top',
@@ -81,6 +78,9 @@ function initialiseForm(){
         down: 'fa fa-chevron-down'
     }
   })
+
+  //init the instant search function
+  instant_search.enableInstantSearch(_products, _equipment)
 
   //prefill date field and production line
   prefill()

@@ -13,6 +13,8 @@ export class DataList {
 			d => filter === "" || d.text.toLowerCase().replace(/ /g,'').includes(filter.toLowerCase().replace(/ /g,''))
 		);
 
+        console.log(list.classList);
+        
 		if (filterOptions.length === 0) {
 			list.classList.remove("active");
 		} else {

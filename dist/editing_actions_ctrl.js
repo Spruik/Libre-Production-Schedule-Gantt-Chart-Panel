@@ -62,9 +62,6 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
   }
 
   function initialiseForm() {
-    //init the instant search function
-    instant_search.enableInstantSearch(_products, _equipment);
-
     //init datepicker
     $('#datepicker').datepicker({
       orientation: 'top',
@@ -86,6 +83,9 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
         down: 'fa fa-chevron-down'
       }
     });
+
+    //init the instant search function
+    instant_search.enableInstantSearch(_products, _equipment);
 
     //prefill date field and production line
     prefill();
