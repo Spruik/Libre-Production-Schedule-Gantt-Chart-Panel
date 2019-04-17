@@ -8,7 +8,11 @@ import {DataList} from './datalist'
  */
 export function enableInstantSearch (products, productionLines) {
   
+  console.log(products);
+  
   if (productionLines) {
+    console.log(productionLines);
+
     productionLines = productionLines.filter(data => data.production_line !== null && data.equipment === null)
 
     const productionLineData = productionLines.reduce((arr, line) => {
