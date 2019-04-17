@@ -47,12 +47,12 @@ System.register([], function (_export, _context) {
 					value: function create() {
 						var filter = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
 
+						console.log(list.classList);
+
 						var list = document.getElementById(this.listId);
 						var filterOptions = this.options.filter(function (d) {
 							return filter === "" || d.text.toLowerCase().replace(/ /g, '').includes(filter.toLowerCase().replace(/ /g, ''));
 						});
-
-						console.log(list.classList);
 
 						if (filterOptions.length === 0) {
 							list.classList.remove("active");
