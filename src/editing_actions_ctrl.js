@@ -46,7 +46,7 @@ function tryInitialisingForm(){
     }catch(e){
       if (_tryCatchCounter < 15) {
         //maximunm re-init the form over 15 times
-        initialiseForm()
+        tryInitialisingForm()
         _tryCatchCounter++
       }else{
         closeForm()

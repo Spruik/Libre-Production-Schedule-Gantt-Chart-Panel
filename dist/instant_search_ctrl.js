@@ -14,10 +14,7 @@ System.register(['./datalist'], function (_export, _context) {
    */
   function enableInstantSearch(products, productionLines) {
 
-    console.log(products);
-
     if (productionLines) {
-      console.log(productionLines);
 
       productionLines = productionLines.filter(function (data) {
         return data.production_line !== null && data.equipment === null;

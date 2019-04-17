@@ -90,7 +90,7 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
       } catch (e) {
         if (_tryCatchCounter < 15) {
           //maximunm re-init the form over 15 times
-          initialiseForm();
+          tryInitialisingForm();
           _tryCatchCounter++;
         } else {
           closeForm();

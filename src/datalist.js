@@ -8,8 +8,6 @@ export class DataList {
 	}
 
 	create(filter = "") {
-        console.log(list.classList);
-
         const list = document.getElementById(this.listId);
 		const filterOptions = this.options.filter(
 			d => filter === "" || d.text.toLowerCase().replace(/ /g,'').includes(filter.toLowerCase().replace(/ /g,''))
