@@ -155,25 +155,26 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
       return;
     }
 
-    if (isTagsChanged(inputValues)) {
+    // if (isTagsChanged(inputValues)) {
 
-      updateOldAndNewOrders(inputValues);
-    } else {
-      //in here, check if the line has changed, if yes, meaning that the order is going to another line
-      //so also update all affectingOrders(orders that are in the original line and that are after this order)
-      if (isLineChanged(inputValues)) {
-        //save the order directly with removing its starttime and endtime to let the initialiser to init it again
-        //coz it is changing line, so just simply remove the start time and end time
-        updateWithRemoving(inputValues);
-      } else {
-        if (isDateChanged(inputValues)) {
-          updateWithRemoving(inputValues);
-        } else {
-          //save the order directly with changing its starttime and endtime
-          updateWithChanging(inputValues);
-        }
-      }
-    }
+    updateOldAndNewOrders(inputValues);
+
+    // }else {
+    //   //in here, check if the line has changed, if yes, meaning that the order is going to another line
+    //   //so also update all affectingOrders(orders that are in the original line and that are after this order)
+    //   if (isLineChanged(inputValues)) {
+    //     //save the order directly with removing its starttime and endtime to let the initialiser to init it again
+    //     //coz it is changing line, so just simply remove the start time and end time
+    //     updateWithRemoving(inputValues)
+    //   }else{
+    //     if (isDateChanged(inputValues)) {
+    //       updateWithRemoving(inputValues)
+    //     }else{
+    //       //save the order directly with changing its starttime and endtime
+    //       updateWithChanging(inputValues)
+    //     }
+    //   }
+    // }
   }
 
   /**

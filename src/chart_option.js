@@ -331,7 +331,6 @@ function clipRectByRect(params, rect) {
 
 function onDragSwitchClick(model, api, type) {
   _draggable = !_draggable;
-  console.log('here');
   _myChart.setOption({
       dataZoom: [{
           id: 'insideX',
@@ -360,7 +359,6 @@ export function refreshDashboard(){
 }
 
 function initDrag(myChart){
-  console.log('here');
   _autoDataZoomAnimator = makeAnimator(dispatchDataZoom);
   myChart.on('mousedown', function (param) {
     // console.log(param.event.offsetX);
@@ -512,9 +510,7 @@ function initDrag(myChart){
 
   function autoDataZoomWhenDraggingOutside(cursorX, cursorY) {
       // When cursor is outside the cartesian and being dragging,
-      // auto move the dataZooms.
-      console.log('here2');
-      
+      // auto move the dataZooms.      
       var cursorDistX = getCursorCartesianDist(cursorX, _cartesianXBounds);
       var cursorDistY = getCursorCartesianDist(cursorY, _cartesianYBounds);
 

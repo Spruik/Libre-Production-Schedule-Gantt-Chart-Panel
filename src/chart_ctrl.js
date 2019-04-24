@@ -83,19 +83,19 @@ export class ChartCtrl extends MetricsPanelCtrl {
         return
     }
 
-    //dataList data is messy and with lots of unwanted data, so we need to filter out data that we want -
-    let data = dp.restructuredData(dataList[0].columns, dataList[0].rows)
-    if (data.length === 0) {
-        this.hasData = false
-        return
-    }
-
     //if everything is all good, start getting production line details (start time) from postgresdb
-    const callback = () => {
-      this.render(data)
-    }
     utils.queryProductionLineDetails(callback)
 
+    let self = this
+    function callback(){      
+      //dataList data is messy and with lots of unwanted data, so we need to filter out data that we want -
+      let data = dp.restructuredData(dataList[0].columns, dataList[0].rows)
+      if (data.length === 0) {
+          this.hasData = false
+          return
+      }
+      self.render(data)
+    }
   }
 
   rendering(){

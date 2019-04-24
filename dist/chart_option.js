@@ -292,7 +292,6 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
 
   function onDragSwitchClick(model, api, type) {
     _draggable = !_draggable;
-    console.log('here');
     _myChart.setOption({
       dataZoom: [{
         id: 'insideX',
@@ -325,7 +324,6 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
   _export('refreshDashboard', refreshDashboard);
 
   function initDrag(myChart) {
-    console.log('here');
     _autoDataZoomAnimator = makeAnimator(dispatchDataZoom);
     myChart.on('mousedown', function (param) {
       // console.log(param.event.offsetX);
@@ -469,9 +467,7 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
 
     function autoDataZoomWhenDraggingOutside(cursorX, cursorY) {
       // When cursor is outside the cartesian and being dragging,
-      // auto move the dataZooms.
-      console.log('here2');
-
+      // auto move the dataZooms.      
       var cursorDistX = getCursorCartesianDist(cursorX, _cartesianXBounds);
       var cursorDistY = getCursorCartesianDist(cursorY, _cartesianYBounds);
 
@@ -573,11 +569,12 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
         }
       }
     });
+
+    //get current datazoom slider's start and end points so that the slider will not reset after refreshing the page
     myChart.on('dataZoom', function (params) {
       if (params.dataZoomId.localeCompare('series00') === 0) {
         _bottomSliderDataZoomStart = params.start;
         _bottomSliderDataZoomEnd = params.end;
-        console.log('yes');
       }
     });
   }

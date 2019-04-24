@@ -167,8 +167,6 @@ System.register(['angular', 'lodash', 'jquery', './data_processor', './chart_opt
         }, {
           key: 'onDataReceived',
           value: function onDataReceived(dataList) {
-            var _this2 = this;
-
             if (dataList.length === 0 || dataList === null || dataList === undefined) {
               // console.log('No data reveived')
               this.hasData = false;
@@ -182,18 +180,19 @@ System.register(['angular', 'lodash', 'jquery', './data_processor', './chart_opt
               return;
             }
 
-            //dataList data is messy and with lots of unwanted data, so we need to filter out data that we want -
-            var data = dp.restructuredData(dataList[0].columns, dataList[0].rows);
-            if (data.length === 0) {
-              this.hasData = false;
-              return;
-            }
-
             //if everything is all good, start getting production line details (start time) from postgresdb
-            var callback = function callback() {
-              _this2.render(data);
-            };
             utils.queryProductionLineDetails(callback);
+
+            var self = this;
+            function callback() {
+              //dataList data is messy and with lots of unwanted data, so we need to filter out data that we want -
+              var data = dp.restructuredData(dataList[0].columns, dataList[0].rows);
+              if (data.length === 0) {
+                this.hasData = false;
+                return;
+              }
+              self.render(data);
+            }
           }
         }, {
           key: 'rendering',
