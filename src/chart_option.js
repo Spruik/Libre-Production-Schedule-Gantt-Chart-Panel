@@ -31,6 +31,9 @@ let _autoDataZoomAnimator;
 let _myChart
 let _panelCtrl
 
+let _bottomSliderDataZoomStart
+let _bottomSliderDataZoomEnd
+
 export function getOption (data, ) {
   
   _rawData = data  
@@ -57,16 +60,22 @@ export function getOption (data, ) {
         left: 'center'
     },
     dataZoom: [{
-        type: 'slider',
-        xAxisIndex: 0,
-        filterMode: 'weakFilter',
-        height: 20,
-        bottom: 0,
-        start: 0,
-        end: 100,
-        handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
-        handleSize: '80%',
-        showDetail: false
+      type: 'slider',
+      xAxisIndex: 0,
+      filterMode: 'weakFilter',
+      height: 10,
+      bottom: 8,
+      start: _bottomSliderDataZoomStart || 0,
+      end: _bottomSliderDataZoomEnd || 100,
+      handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+      handleSize: 15,
+      showDetail: false,
+      handleStyle: {
+          shadowBlur: 6,
+          shadowOffsetX: 1,
+          shadowOffsetY: 2,
+          shadowColor: '#aaa'
+      },
     }, {
         type: 'inside',
         id: 'insideX',
@@ -85,14 +94,14 @@ export function getOption (data, ) {
         top: 70,
         bottom: 20,
         start: 0,
-        end: 1000,
+        end: 100,
         handleSize: 0,
         showDetail: false,
     }, {
         type: 'inside',
         id: 'insideY',
         yAxisIndex: 0,
-        start: 95,
+        start: 0,
         end: 100,
         zoomOnMouseWheel: false,
         moveOnMouseMove: true,
@@ -322,6 +331,7 @@ function clipRectByRect(params, rect) {
 
 function onDragSwitchClick(model, api, type) {
   _draggable = !_draggable;
+  console.log('here');
   _myChart.setOption({
       dataZoom: [{
           id: 'insideX',
@@ -350,8 +360,8 @@ export function refreshDashboard(){
 }
 
 function initDrag(myChart){
+  console.log('here');
   _autoDataZoomAnimator = makeAnimator(dispatchDataZoom);
-
   myChart.on('mousedown', function (param) {
     // console.log(param.event.offsetX);
     
@@ -503,6 +513,8 @@ function initDrag(myChart){
   function autoDataZoomWhenDraggingOutside(cursorX, cursorY) {
       // When cursor is outside the cartesian and being dragging,
       // auto move the dataZooms.
+      console.log('here2');
+      
       var cursorDistX = getCursorCartesianDist(cursorX, _cartesianXBounds);
       var cursorDistY = getCursorCartesianDist(cursorY, _cartesianYBounds);
 
@@ -531,7 +543,7 @@ function initDrag(myChart){
       batch: batch
     });
 
-    function prepareBatch(batch, id, start, end, cursorDist) {
+    function prepareBatch(batch, id, start, end, cursorDist) {      
       if (cursorDist === 0) {
           return;
       }
@@ -600,11 +612,21 @@ function initDrag(myChart){
 
 function setListeners(myChart){
   myChart.off('click')
+  myChart.off('dataZoom')
+
   myChart.on('click', params => {
     if (!_draggable) {
       if (params.data[fi('status')] !== 'Changeover') {
         order_actions.showOrderActions(utils.mergeKeyVal(params.data, _rawData.order.dimensions))
       }
+    }
+  })
+
+  //get current datazoom slider's start and end points so that the slider will not reset after refreshing the page
+  myChart.on('dataZoom', params => {
+    if (params.dataZoomId.localeCompare('series00') === 0) {
+      _bottomSliderDataZoomStart = params.start
+      _bottomSliderDataZoomEnd = params.end
     }
   })
 }

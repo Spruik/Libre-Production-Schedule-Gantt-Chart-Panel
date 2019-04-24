@@ -69,8 +69,7 @@ export class ChartCtrl extends MetricsPanelCtrl {
     this.render();
   }
 
-  onDataReceived(dataList) {
-    
+  onDataReceived(dataList) {    
     if (dataList.length === 0 || dataList === null || dataList === undefined) {
         // console.log('No data reveived')
         this.hasData = false
@@ -91,7 +90,12 @@ export class ChartCtrl extends MetricsPanelCtrl {
         return
     }
 
-    this.render(data)
+    //if everything is all good, start getting production line details (start time) from postgresdb
+    const callback = () => {
+      this.render(data)
+    }
+    utils.queryProductionLineDetails(callback)
+
   }
 
   rendering(){
@@ -105,9 +109,8 @@ export class ChartCtrl extends MetricsPanelCtrl {
     
     function renderPanel(data) { 
       if (!myChart || !data) { return; }
-
       const option = chart.getOption(data)
-
+      // myChart.clear();
       myChart.setOption(option);
       setTimeout(() => {
           $('#production-schedule-gantt-chart').height(ctrl.height - 51)

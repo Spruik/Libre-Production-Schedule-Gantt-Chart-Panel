@@ -167,6 +167,7 @@ System.register(['angular', 'lodash', 'jquery', './data_processor', './chart_opt
         }, {
           key: 'onDataReceived',
           value: function onDataReceived(dataList) {
+            var _this2 = this;
 
             if (dataList.length === 0 || dataList === null || dataList === undefined) {
               // console.log('No data reveived')
@@ -188,7 +189,11 @@ System.register(['angular', 'lodash', 'jquery', './data_processor', './chart_opt
               return;
             }
 
-            this.render(data);
+            //if everything is all good, start getting production line details (start time) from postgresdb
+            var callback = function callback() {
+              _this2.render(data);
+            };
+            utils.queryProductionLineDetails(callback);
           }
         }, {
           key: 'rendering',
@@ -206,9 +211,8 @@ System.register(['angular', 'lodash', 'jquery', './data_processor', './chart_opt
               if (!myChart || !data) {
                 return;
               }
-
               var option = chart.getOption(data);
-
+              // myChart.clear();
               myChart.setOption(option);
               setTimeout(function () {
                 $('#production-schedule-gantt-chart').height(ctrl.height - 51);

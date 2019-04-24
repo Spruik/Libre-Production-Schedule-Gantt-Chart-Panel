@@ -3,7 +3,8 @@
 System.register(['app/core/core'], function (_export, _context) {
   "use strict";
 
-  var appEvents, hostname, influxHost, postgRestHost, get, post, alert, showModal, copyObject;
+  var appEvents, hostname, influxHost, postgRestHost, _prodLineDetails, get, post, alert, showModal, copyObject;
+
   function sortMax(data) {
     return data.sort(function (a, b) {
       return b.order_id - a.order_id;
@@ -51,10 +52,40 @@ System.register(['app/core/core'], function (_export, _context) {
   _export('findDistinct', findDistinct);
 
   function getLineStartTime(line) {
-    return '6:00:00';
+    var l = line.split(' | ');
+    var target = _prodLineDetails.filter(function (line) {
+      return line.site === l[0] && line.area === l[1] && line.production_line === l[2];
+    });
+    if (target.length === 0) {
+      return '6:00:00';
+    } else {
+      if (target[0].start_time) {
+        return target[0].start_time;
+      } else {
+        return '6:00:00';
+      }
+    }
   }
 
+  /**
+   * It sends query to postgres db to get production line details and then
+   * set the results global in this utils file for further uses.
+   * Then execute the callback funtion when finished.
+   */
+
   _export('getLineStartTime', getLineStartTime);
+
+  function queryProductionLineDetails(callback) {
+    var url = postgRestHost + 'equipment?site=not.is.null&area=not.is.null&production_line=not.is.null&equipment=is.null';
+    get(url).then(function (res) {
+      _prodLineDetails = res;
+      callback();
+    }).catch(function (e) {
+      alert('error', 'Error', 'An error has occurred due to ' + e + ', please refresh the page and try again');
+    });
+  }
+
+  _export('queryProductionLineDetails', queryProductionLineDetails);
 
   function highlightColor(hexColor) {
     var rgb = hexToRgb(hexColor);
@@ -102,6 +133,8 @@ System.register(['app/core/core'], function (_export, _context) {
       _export('postgRestHost', postgRestHost = 'http://' + hostname + ':5436/');
 
       _export('postgRestHost', postgRestHost);
+
+      _prodLineDetails = void 0;
 
       _export('get', get = function get(url) {
         return new Promise(function (resolve, reject) {

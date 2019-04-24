@@ -4,6 +4,8 @@ const hostname = window.location.hostname
 export const influxHost = 'http://' + hostname + ':8086/'
 export const postgRestHost = 'http://' + hostname + ':5436/'
 
+let _prodLineDetails
+
 export const get = url => {
   return new Promise((resolve, reject) => {
       var xhr = new XMLHttpRequest()
@@ -104,7 +106,32 @@ export function findDistinct(arr){
  * @param {*} line 
  */
 export function getLineStartTime(line){
-  return '6:00:00'
+  const l = line.split(' | ')
+  const target = _prodLineDetails.filter(line => line.site === l[0] && line.area === l[1] && line.production_line === l[2])
+  if (target.length === 0) {
+    return '6:00:00'
+  }else {
+    if (target[0].start_time) {
+      return target[0].start_time
+    }else {
+      return '6:00:00'
+    }
+  }
+}
+
+/**
+ * It sends query to postgres db to get production line details and then
+ * set the results global in this utils file for further uses.
+ * Then execute the callback funtion when finished.
+ */
+export function queryProductionLineDetails(callback){
+  const url = postgRestHost + 'equipment?site=not.is.null&area=not.is.null&production_line=not.is.null&equipment=is.null'
+  get(url).then(res => {
+    _prodLineDetails = res
+    callback()
+  }).catch(e => {
+    alert('error', 'Error', 'An error has occurred due to ' + e + ', please refresh the page and try again')
+  })
 }
 
 export function highlightColor(hexColor){
