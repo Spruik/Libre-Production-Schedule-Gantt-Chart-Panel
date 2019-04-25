@@ -11,7 +11,7 @@ System.register(['./utils', './influx_helper', './insertion_actions_ctrl', './ed
 
     //check if the order is available for editing, only 'planned' and 'ready' can be edited by scheduler
     if (order.status !== 'Planned' && order.status !== 'Ready') {
-      utils.alert('warning', 'Warning', 'This order is ' + rowData.order_state + ' and is no longer available for editing');
+      utils.alert('warning', 'Warning', 'The order status is ' + order.status + ', so it is no longer available for editing');
       return;
     }
 
