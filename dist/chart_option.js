@@ -123,7 +123,6 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
         dimensions: _rawData.order.dimensions,
         tooltip: {
           formatter: function formatter(params) {
-
             var startTime = moment(params.data[1]).format('YYYY-MM-DD H:mm:ss');
             var endTime = moment(params.data[2]).format('YYYY-MM-DD H:mm:ss');
             var compl_qty = params.data[fi('compl_qty')] === null ? 0 : params.data[fi('compl_qty')];
@@ -136,8 +135,15 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
               tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Planned Qty :</strong> &nbsp;' + params.data[fi('order_qty')] + '</p> ';
               tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Confirmed Qty :</strong> &nbsp;' + compl_qty + '</p> ';
             }
-            tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Start Time :</strong> &nbsp;' + startTime + '</p> ';
-            tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">End Time :</strong> &nbsp;' + endTime + '</p> ';
+            tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Scheduled Start Time :</strong> &nbsp;' + startTime + '</p> ';
+            tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Scheduled End Time :</strong> &nbsp;' + endTime + '</p> ';
+            if (params.data[fi('status')] === 'Running' || params.data[fi('status')] === 'Paused') {
+              tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Actual Start Time :</strong> &nbsp;' + moment(params.data[fi('actual_start_datetime')]).format('YYYY-MM-DD H:mm:ss') + '</p> ';
+            }
+            if (params.data[fi('status')] === 'Complete' || params.data[fi('status')] === 'Closed') {
+              tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Actual Start Time :</strong> &nbsp;' + moment(params.data[fi('actual_start_datetime')]).format('YYYY-MM-DD H:mm:ss') + '</p> ';
+              tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Actual End Time :</strong> &nbsp;' + moment(params.data[fi('actual_end_datetime')]).format('YYYY-MM-DD H:mm:ss') + '</p> ';
+            }
             return tooltip;
           },
           backgroundColor: '#eee',
@@ -327,7 +333,6 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
     _autoDataZoomAnimator = makeAnimator(dispatchDataZoom);
     myChart.on('mousedown', function (param) {
       // console.log(param.event.offsetX);
-
       if (!_draggable || !param || param.seriesIndex === null) {
         return;
       }
@@ -442,8 +447,8 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
     function updateRawData() {
       var orderData = _rawData.order.data;
       var movingItem = orderData[_draggingRecord.dataIndex];
-      //If the dragging item is a changeover item, return.
-      if (movingItem[fi('status')] === 'Changeover') {
+      //Only Planned and Ready order can be moved.
+      if (movingItem[fi('status')] !== 'Planned' && movingItem[fi('status')] !== 'Ready') {
         return;
       }
 
@@ -572,9 +577,11 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
 
     //get current datazoom slider's start and end points so that the slider will not reset after refreshing the page
     myChart.on('dataZoom', function (params) {
-      if (params.dataZoomId.localeCompare('series00') === 0) {
-        _bottomSliderDataZoomStart = params.start;
-        _bottomSliderDataZoomEnd = params.end;
+      if (params.dataZoomId) {
+        if (params.dataZoomId.localeCompare('series00') === 0) {
+          _bottomSliderDataZoomStart = params.start;
+          _bottomSliderDataZoomEnd = params.end;
+        }
       }
     });
   }
