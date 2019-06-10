@@ -132,6 +132,8 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
             if (params.data[fi('status')] === 'Changeover') {
               tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Change-Over </strong></p> ';
             } else {
+              tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Product ID :</strong> &nbsp;' + params.data[fi('product_id')] + '</p> ';
+              tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Product Desc :</strong> &nbsp;' + params.data[fi('product_desc')] + '</p> ';
               tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Planned Qty :</strong> &nbsp;' + params.data[fi('order_qty')] + '</p> ';
               tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Confirmed Qty :</strong> &nbsp;' + compl_qty + '</p> ';
             }
@@ -197,7 +199,7 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
     var x = timeArrival[0];
     var y = timeArrival[1] - barHeight;
 
-    var flightNumber = status === 'Changeover' ? 'C' : api.value(4) + '';
+    var flightNumber = status === 'Changeover' ? 'C' : api.value(4) + ' - ' + api.value(6) + '';
     var flightNumberWidth = echarts.format.getTextRect(flightNumber).width;
     var text = barLength > flightNumberWidth + 40 && x + barLength >= 180 ? flightNumber : '';
 

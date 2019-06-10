@@ -36,7 +36,7 @@ let _bottomSliderDataZoomEnd
 
 export function getOption (data, ) {
   
-  _rawData = data  
+  _rawData = data    
   
   let option = {
     tooltip: {
@@ -153,7 +153,7 @@ export function getOption (data, ) {
         renderItem: renderGanttItem,
         dimensions: _rawData.order.dimensions,
         tooltip: {
-            formatter: params => {                
+            formatter: params => {                                
                 const startTime = moment(params.data[1]).format('YYYY-MM-DD H:mm:ss')
                 const endTime = moment(params.data[2]).format('YYYY-MM-DD H:mm:ss')
                 const compl_qty = params.data[fi('compl_qty')] === null ? 0 : params.data[fi('compl_qty')]
@@ -163,6 +163,8 @@ export function getOption (data, ) {
                 if (params.data[fi('status')]  === 'Changeover') {
                   tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Change-Over </strong></p> '
                 }else {
+                  tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Product ID :</strong> &nbsp;' + params.data[fi('product_id')] + '</p> '
+                  tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Product Desc :</strong> &nbsp;' + params.data[fi('product_desc')] + '</p> '
                   tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Planned Qty :</strong> &nbsp;' + params.data[fi('order_qty')] + '</p> '
                   tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Confirmed Qty :</strong> &nbsp;' + compl_qty + '</p> '
                 }
@@ -228,7 +230,7 @@ function renderGanttItem(params, api) {
   var x = timeArrival[0];
   var y = timeArrival[1] - barHeight;
 
-  var flightNumber = status === 'Changeover' ? 'C' : api.value(4) + ''
+  var flightNumber = status === 'Changeover' ? 'C' : api.value(4) + ' - ' + api.value(6) + ''
   var flightNumberWidth = echarts.format.getTextRect(flightNumber).width;
   var text = (barLength > flightNumberWidth + 40 && x + barLength >= 180)
       ? flightNumber : '';
