@@ -1,4 +1,5 @@
 import angular from 'angular'
+import moment from 'moment'
 import _ from 'lodash'
 import $ from 'jquery'
 import * as dp from './data_processor'
@@ -71,16 +72,26 @@ export class ChartCtrl extends MetricsPanelCtrl {
 
   onDataReceived(dataList) {    
     if (dataList.length === 0 || dataList === null || dataList === undefined) {
-        // console.log('No data reveived')
-        this.hasData = false
-        return
-    }else {
-        this.hasData = true
+      // console.log('No data reveived')
+      this.hasData = false
+      return
     }
 
+    // time range
+    const from = this.templateSrv.timeRange.from
+    const to = this.templateSrv.timeRange.to
+
+    dataList = this.filter(dataList, from, to) // filter out those with status of 'replaced' or 'deleted' and those that are not in the time range
+    if (dataList[0].rows.length === 0) {
+      this.hasData = false
+      return
+    }else {
+      this.hasData = true
+    }
+    
     if (dataList[0].type !== 'table') {
-        console.log('To show the pie chart, please format data as a TABLE in the Metrics Setting')
-        return
+      console.log('To show the pie chart, please format data as a TABLE in the Metrics Setting')
+      return
     }
 
     //if everything is all good, start getting production line details (start time) from postgresdb
@@ -90,12 +101,35 @@ export class ChartCtrl extends MetricsPanelCtrl {
     function callback(){      
       //dataList data is messy and with lots of unwanted data, so we need to filter out data that we want -
       let data = dp.restructuredData(dataList[0].columns, dataList[0].rows)
-      if (data.length === 0) {
-          this.hasData = false
-          return
-      }
+      if (data.length === 0) { return }
       self.render(data)
     }
+  }
+
+  // 1. filter out records that are not of status of 'Replaced'
+  // 2. filter out records that are not in the time range
+  filter(dataList, from, to) {
+    if (dataList.length === 0) {
+      return dataList
+    }
+  
+    let rows = dataList[0].rows
+    rows = rows.filter(row => {
+      const lowerCaseRow = row.map(elem => (typeof elem === 'string') ? elem.toLowerCase() : elem)
+      if (lowerCaseRow.indexOf('replaced') === -1 && lowerCaseRow.indexOf('deleted') === -1) {
+        if (!row[10]) { return row } // at the first time the start time will be null, let it in for now, and the time will be assigned, which will be examined later
+        const scheduledStartTimeTimeStamp = row[10] // the scheduled start time is the 10th elem
+        const scheduledStartTime = moment(scheduledStartTimeTimeStamp) // moment shcedule start time
+        const changeover = moment.duration(row[9], 'H:mm:ss') // moment changeover
+        scheduledStartTime.subtract(changeover) // start time - changeover to have the initial time
+        if (scheduledStartTime.isSameOrAfter(from) && scheduledStartTime.isSameOrBefore(to)) {
+          // if scheduled start time >= $from && <= $to
+          return row
+        }
+      }
+    })
+    dataList[0].rows = rows
+    return dataList
   }
 
   rendering(){

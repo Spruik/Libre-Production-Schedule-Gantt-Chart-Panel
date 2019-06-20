@@ -28,7 +28,6 @@ System.register(['./utils', 'moment', './chart_ctrl'], function (_export, _conte
       data.push(serise);
     }
 
-    data = filterData(data);
     if (data.length === 0) {
       return [];
     }
@@ -37,12 +36,6 @@ System.register(['./utils', 'moment', './chart_ctrl'], function (_export, _conte
   }
 
   _export('restructuredData', restructuredData);
-
-  function filterData(data) {
-    return data.filter(function (d) {
-      return d.status !== 'Deleted' && d.status !== 'Replaced';
-    });
-  }
 
   function tailorData(data, rowCols) {
 

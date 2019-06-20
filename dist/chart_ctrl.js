@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['angular', 'lodash', 'jquery', './data_processor', './chart_option', './utils', './libs/echarts.min', 'app/plugins/sdk', './css/style.css!', './css/bootstrap-slider.css!', './css/instant-search.css!'], function (_export, _context) {
+System.register(['angular', 'moment', 'lodash', 'jquery', './data_processor', './chart_option', './utils', './libs/echarts.min', 'app/plugins/sdk', './css/style.css!', './css/bootstrap-slider.css!', './css/instant-search.css!'], function (_export, _context) {
   "use strict";
 
-  var angular, _, $, dp, chart, utils, echarts, MetricsPanelCtrl, _createClass, _get, _ctrl, panelDefaults, ChartCtrl;
+  var angular, moment, _, $, dp, chart, utils, echarts, MetricsPanelCtrl, _createClass, _get, _ctrl, panelDefaults, ChartCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -44,6 +44,8 @@ System.register(['angular', 'lodash', 'jquery', './data_processor', './chart_opt
   return {
     setters: [function (_angular) {
       angular = _angular.default;
+    }, function (_moment) {
+      moment = _moment.default;
     }, function (_lodash) {
       _ = _lodash.default;
     }, function (_jquery) {
@@ -171,6 +173,16 @@ System.register(['angular', 'lodash', 'jquery', './data_processor', './chart_opt
               // console.log('No data reveived')
               this.hasData = false;
               return;
+            }
+
+            // time range
+            var from = this.templateSrv.timeRange.from;
+            var to = this.templateSrv.timeRange.to;
+
+            dataList = this.filter(dataList, from, to); // filter out those with status of 'replaced' or 'deleted' and those that are not in the time range
+            if (dataList[0].rows.length === 0) {
+              this.hasData = false;
+              return;
             } else {
               this.hasData = true;
             }
@@ -188,11 +200,39 @@ System.register(['angular', 'lodash', 'jquery', './data_processor', './chart_opt
               //dataList data is messy and with lots of unwanted data, so we need to filter out data that we want -
               var data = dp.restructuredData(dataList[0].columns, dataList[0].rows);
               if (data.length === 0) {
-                this.hasData = false;
                 return;
               }
               self.render(data);
             }
+          }
+        }, {
+          key: 'filter',
+          value: function filter(dataList, from, to) {
+            if (dataList.length === 0) {
+              return dataList;
+            }
+
+            var rows = dataList[0].rows;
+            rows = rows.filter(function (row) {
+              var lowerCaseRow = row.map(function (elem) {
+                return typeof elem === 'string' ? elem.toLowerCase() : elem;
+              });
+              if (lowerCaseRow.indexOf('replaced') === -1 && lowerCaseRow.indexOf('deleted') === -1) {
+                if (!row[10]) {
+                  return row;
+                } // at the first time the start time will be null, let it in for now, and the time will be assigned, which will be examined later
+                var scheduledStartTimeTimeStamp = row[10]; // the scheduled start time is the 10th elem
+                var scheduledStartTime = moment(scheduledStartTimeTimeStamp); // moment shcedule start time
+                var changeover = moment.duration(row[9], 'H:mm:ss'); // moment changeover
+                scheduledStartTime.subtract(changeover); // start time - changeover to have the initial time
+                if (scheduledStartTime.isSameOrAfter(from) && scheduledStartTime.isSameOrBefore(to)) {
+                  // if scheduled start time >= $from && <= $to
+                  return row;
+                }
+              }
+            });
+            dataList[0].rows = rows;
+            return dataList;
           }
         }, {
           key: 'rendering',

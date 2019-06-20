@@ -28,14 +28,9 @@ export function restructuredData (rowCols, rows) {
     data.push(serise)
   }
 
-  data = filterData(data)
   if (data.length === 0) {return []}  
 
   return tailorData(data, rowCols)
-}
-
-function filterData(data){
-    return data.filter(d => d.status !== 'Deleted' && d.status !== 'Replaced')
 }
 
 function tailorData(data, rowCols) {
