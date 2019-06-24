@@ -180,6 +180,7 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
   function renderGanttItem(params, api) {
 
     var status = api.value(dp.findIndex('status', _rawData.order.dimensions));
+    var pId = api.value(dp.findIndex('product_id_api', _rawData.order.dimensions));
     var color = dp.getColor(status);
     var highlightColor = utils.highlightColor(color);
 
@@ -199,7 +200,7 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
     var x = timeArrival[0];
     var y = timeArrival[1] - barHeight;
 
-    var flightNumber = status === 'Changeover' ? 'C' : api.value(4) + ' - ' + api.value(6) + '';
+    var flightNumber = status === 'Changeover' ? 'C' : api.value(4) + ' - ' + pId.replace('###', '') + '';
     var flightNumberWidth = echarts.format.getTextRect(flightNumber).width;
     var text = barLength > flightNumberWidth + 40 && x + barLength >= 180 ? flightNumber : '';
 

@@ -187,6 +187,14 @@ function tailorData(data, rowCols) {
   _order_data = order_data
   _order_dimensions = order_dimensions
 
+  // Echart automatically convert number String to Int, so need to add some extra non-num String to avoid this
+  // Will need to String.replace('###', '') when use it
+  order_data.forEach(e => {
+    const product_id_api = e[findIndex('product_id', order_dimensions)] + '###'
+    e.push(product_id_api)
+  })
+  order_dimensions.push('product_id_api')
+
   //return the expect option data
   return {
     order: {data: order_data, dimensions: order_dimensions},

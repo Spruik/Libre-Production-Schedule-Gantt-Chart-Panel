@@ -36,7 +36,7 @@ let _bottomSliderDataZoomEnd
 
 export function getOption (data, ) {
   
-  _rawData = data    
+  _rawData = data   
   
   let option = {
     tooltip: {
@@ -210,7 +210,8 @@ export function getOption (data, ) {
 
 function renderGanttItem(params, api) {
   
-  let status = api.value(dp.findIndex('status', _rawData.order.dimensions))
+  const status = api.value(dp.findIndex('status', _rawData.order.dimensions))
+  const pId = api.value(dp.findIndex('product_id_api', _rawData.order.dimensions))
   const color = dp.getColor(status)
   const highlightColor = utils.highlightColor(color)
   
@@ -230,7 +231,7 @@ function renderGanttItem(params, api) {
   var x = timeArrival[0];
   var y = timeArrival[1] - barHeight;
 
-  var flightNumber = status === 'Changeover' ? 'C' : api.value(4) + ' - ' + api.value(6) + ''
+  var flightNumber = status === 'Changeover' ? 'C' : api.value(4) + ' - ' + pId.replace('###', '') + ''
   var flightNumberWidth = echarts.format.getTextRect(flightNumber).width;
   var text = (barLength > flightNumberWidth + 40 && x + barLength >= 180)
       ? flightNumber : '';
