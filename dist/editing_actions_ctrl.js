@@ -374,7 +374,7 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
 
     var dateRegExp = new RegExp('^[0-9]{4}-(((0[13578]|(10|12))-(0[1-9]|[1-2][0-9]|3[0-1]))|(02-(0[1-9]|[1-2][0-9]))|((0[469]|11)-(0[1-9]|[1-2][0-9]|30)))$');
     var prodList = _products.reduce(function (arr, p) {
-      var str = p.product_id + ' | ' + p.product_desc;
+      var str = p.id + ' | ' + p.product_desc;
       arr.push(str);
       return arr;
     }, []);
@@ -473,7 +473,7 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
    * @param {fn} callback 
    */
   function getProductsAndEquipment(callback) {
-    var productsUrl = utils.postgRestHost + 'products';
+    var productsUrl = utils.postgRestHost + 'product';
     var equipmentsUrl = utils.postgRestHost + 'equipment?production_line=not.is.null';
 
     utils.get(productsUrl).then(function (res) {

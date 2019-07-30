@@ -243,7 +243,7 @@ function isValueValid(data) {
 
   const dateRegExp = new RegExp('^[0-9]{4}-(((0[13578]|(10|12))-(0[1-9]|[1-2][0-9]|3[0-1]))|(02-(0[1-9]|[1-2][0-9]))|((0[469]|11)-(0[1-9]|[1-2][0-9]|30)))$')
   const prodList = _products.reduce((arr, p) => {
-    const str = p.product_id + ' | ' + p.product_desc
+    const str = p.id + ' | ' + p.product_desc
     arr.push(str)
     return arr
   }, [])
@@ -362,7 +362,7 @@ function getDurationText(momentDuration) {
  * @param {*} callback 
  */
 function getProducts(callback) {
-  let productsUrl = utils.postgRestHost + 'products'
+  let productsUrl = utils.postgRestHost + 'product'
   utils.get(productsUrl)
     .then(res => {
       _products = res
