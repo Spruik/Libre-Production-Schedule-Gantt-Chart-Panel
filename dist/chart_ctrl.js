@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['angular', 'moment', 'lodash', 'jquery', './data_processor', './chart_option', './utils', './libs/echarts.min', 'app/plugins/sdk', './css/style.css!', './css/bootstrap-slider.css!', './css/instant-search.css!'], function (_export, _context) {
+System.register(['angular', 'moment', 'lodash', 'jquery', './data_processor', './chart_option', './utils', './constans', './libs/echarts.min', 'app/plugins/sdk', './css/style.css!', './css/bootstrap-slider.css!', './css/instant-search.css!'], function (_export, _context) {
   "use strict";
 
-  var angular, moment, _, $, dp, chart, utils, echarts, MetricsPanelCtrl, _createClass, _get, _ctrl, panelDefaults, ChartCtrl;
+  var angular, moment, _, $, dp, chart, utils, cons, echarts, MetricsPanelCtrl, _createClass, _get, _ctrl, panelDefaults, ChartCtrl;
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -56,6 +56,8 @@ System.register(['angular', 'moment', 'lodash', 'jquery', './data_processor', '.
       chart = _chart_option;
     }, function (_utils) {
       utils = _utils;
+    }, function (_constans) {
+      cons = _constans;
     }, function (_libsEchartsMin) {
       echarts = _libsEchartsMin.default;
     }, function (_appPluginsSdk) {
@@ -169,6 +171,7 @@ System.register(['angular', 'moment', 'lodash', 'jquery', './data_processor', '.
         }, {
           key: 'onDataReceived',
           value: function onDataReceived(dataList) {
+            //console.log('o', utils.copyObject(dataList))
             if (dataList.length === 0 || dataList === null || dataList === undefined) {
               // console.log('No data reveived')
               this.hasData = false;
@@ -217,7 +220,7 @@ System.register(['angular', 'moment', 'lodash', 'jquery', './data_processor', '.
               var lowerCaseRow = row.map(function (elem) {
                 return typeof elem === 'string' ? elem.toLowerCase() : elem;
               });
-              if (lowerCaseRow.indexOf('replaced') === -1 && lowerCaseRow.indexOf('deleted') === -1) {
+              if (lowerCaseRow.indexOf(cons.STATE_REPLACED) === -1 && lowerCaseRow.indexOf(cons.STATE_DELETED) === -1) {
                 if (!row[10]) {
                   return row;
                 } // at the first time the start time will be null, let it in for now, and the time will be assigned, which will be examined later
@@ -232,6 +235,7 @@ System.register(['angular', 'moment', 'lodash', 'jquery', './data_processor', '.
               }
             });
             dataList[0].rows = rows;
+            //console.log('d', dataList)
             return dataList;
           }
         }, {

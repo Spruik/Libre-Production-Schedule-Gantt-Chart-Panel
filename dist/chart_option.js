@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_order_ctrl', './libs/echarts.min', 'moment'], function (_export, _context) {
+System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_order_ctrl', './constans', './libs/echarts.min', 'moment'], function (_export, _context) {
   "use strict";
 
-  var dp, utils, order_actions, dropCtrl, echarts, moment, HEIGHT_RATIO, DIM_CATEGORY_INDEX, DIM_TIME_ARRIVAL, DIM_TIME_DEPARTURE, DATA_ZOOM_AUTO_MOVE_THROTTLE, DATA_ZOOM_X_INSIDE_INDEX, DATA_ZOOM_Y_INSIDE_INDEX, DATA_ZOOM_AUTO_MOVE_SPEED, DATA_ZOOM_AUTO_MOVE_DETECT_AREA_WIDTH, _draggable, _draggingEl, _dropShadow, _draggingCursorOffset, _draggingTimeLength, _draggingRecord, _dropRecord, _cartesianXBounds, _cartesianYBounds, _rawData, _autoDataZoomAnimator, _myChart, _panelCtrl, _bottomSliderDataZoomStart, _bottomSliderDataZoomEnd;
+  var dp, utils, order_actions, dropCtrl, cons, echarts, moment, HEIGHT_RATIO, DIM_CATEGORY_INDEX, DIM_TIME_ARRIVAL, DIM_TIME_DEPARTURE, DATA_ZOOM_AUTO_MOVE_THROTTLE, DATA_ZOOM_X_INSIDE_INDEX, DATA_ZOOM_Y_INSIDE_INDEX, DATA_ZOOM_AUTO_MOVE_SPEED, DATA_ZOOM_AUTO_MOVE_DETECT_AREA_WIDTH, _draggable, _draggingEl, _dropShadow, _draggingCursorOffset, _draggingTimeLength, _draggingRecord, _dropRecord, _cartesianXBounds, _cartesianYBounds, _rawData, _autoDataZoomAnimator, _myChart, _panelCtrl, _bottomSliderDataZoomStart, _bottomSliderDataZoomEnd;
 
   function getOption(data) {
 
@@ -129,7 +129,7 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
 
             var tooltip = '<p style="text-align:center;margin:0px;color:#999">Order ID : ' + params.data[fi('order_id')] + '</p>';
             tooltip += '<div style="margin:5px 0px 5px 0px; width:100%; height:1px; background: #999"></div>';
-            if (params.data[fi('status')] === 'Changeover') {
+            if (params.data[fi('status')] === cons.STATE_CHANGEOVER) {
               tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Change-Over </strong></p> ';
             } else {
               tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Product ID :</strong> &nbsp;' + params.data[fi('product_id')] + '</p> ';
@@ -139,10 +139,10 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
             }
             tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Scheduled Start Time :</strong> &nbsp;' + startTime + '</p> ';
             tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Scheduled End Time :</strong> &nbsp;' + endTime + '</p> ';
-            if (params.data[fi('status')] === 'Running' || params.data[fi('status')] === 'Paused') {
+            if (params.data[fi('status')] === cons.STATE_START || params.data[fi('status')] === cons.STATE_PAUSE) {
               tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Actual Start Time :</strong> &nbsp;' + moment(params.data[fi('actual_start_datetime')]).format('YYYY-MM-DD H:mm:ss') + '</p> ';
             }
-            if (params.data[fi('status')] === 'Complete' || params.data[fi('status')] === 'Closed') {
+            if (params.data[fi('status')] === cons.STATE_COMPLETE || params.data[fi('status')] === cons.STATE_CLOSE) {
               tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Actual Start Time :</strong> &nbsp;' + moment(params.data[fi('actual_start_datetime')]).format('YYYY-MM-DD H:mm:ss') + '</p> ';
               tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Actual End Time :</strong> &nbsp;' + moment(params.data[fi('actual_end_datetime')]).format('YYYY-MM-DD H:mm:ss') + '</p> ';
             }
@@ -200,7 +200,7 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
     var x = timeArrival[0];
     var y = timeArrival[1] - barHeight;
 
-    var flightNumber = status === 'Changeover' ? 'C' : api.value(4) + ' - ' + pId.replace('###', '') + '';
+    var flightNumber = status === cons.STATE_CHANGEOVER ? 'C' : api.value(4) + ' - ' + pId.replace('###', '') + '';
     var flightNumberWidth = echarts.format.getTextRect(flightNumber).width;
     var text = barLength > flightNumberWidth + 40 && x + barLength >= 180 ? flightNumber : '';
 
@@ -451,7 +451,7 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
       var orderData = _rawData.order.data;
       var movingItem = orderData[_draggingRecord.dataIndex];
       //Only Planned and Ready order can be moved.
-      if (movingItem[fi('status')] !== 'Planned' && movingItem[fi('status')] !== 'Ready') {
+      if (movingItem[fi('status')] !== cons.STATE_PLAN && movingItem[fi('status')] !== cons.STATE_READY) {
         return;
       }
 
@@ -460,7 +460,7 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
         var dataItem = orderData[i];
 
         //if the dragging item is overlapped with changeover, return
-        if (dataItem[fi('status')] === 'Changeover') {
+        if (dataItem[fi('status')] === cons.STATE_CHANGEOVER) {
           return;
         }
 
@@ -572,7 +572,7 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
 
     myChart.on('click', function (params) {
       if (!_draggable) {
-        if (params.data[fi('status')] !== 'Changeover') {
+        if (params.data[fi('status')] !== cons.STATE_CHANGEOVER) {
           order_actions.showOrderActions(utils.mergeKeyVal(params.data, _rawData.order.dimensions));
         }
       }
@@ -605,6 +605,8 @@ System.register(['./data_processor', './utils', './order_actions_ctrl', './drop_
       order_actions = _order_actions_ctrl;
     }, function (_drop_order_ctrl) {
       dropCtrl = _drop_order_ctrl;
+    }, function (_constans) {
+      cons = _constans;
     }, function (_libsEchartsMin) {
       echarts = _libsEchartsMin.default;
     }, function (_moment) {

@@ -2,6 +2,7 @@ import * as dp from './data_processor'
 import * as utils from './utils'
 import * as order_actions from './order_actions_ctrl'
 import * as dropCtrl from './drop_order_ctrl'
+import * as cons from './constans'
 
 import echarts from './libs/echarts.min'
 import moment from 'moment'
@@ -160,7 +161,7 @@ export function getOption (data, ) {
 
                 let tooltip = '<p style="text-align:center;margin:0px;color:#999">Order ID : ' + params.data[fi('order_id')] + '</p>'
                 tooltip += '<div style="margin:5px 0px 5px 0px; width:100%; height:1px; background: #999"></div>'
-                if (params.data[fi('status')]  === 'Changeover') {
+                if (params.data[fi('status')]  === cons.STATE_CHANGEOVER) {
                   tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Change-Over </strong></p> '
                 }else {
                   tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Product ID :</strong> &nbsp;' + params.data[fi('product_id')] + '</p> '
@@ -170,10 +171,10 @@ export function getOption (data, ) {
                 }
                 tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Scheduled Start Time :</strong> &nbsp;' + startTime + '</p> '
                 tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Scheduled End Time :</strong> &nbsp;' + endTime + '</p> '
-                if (params.data[fi('status')]  === 'Running' || params.data[fi('status')]  === 'Paused') {
+                if (params.data[fi('status')]  === cons.STATE_START || params.data[fi('status')]  === cons.STATE_PAUSE) {
                   tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Actual Start Time :</strong> &nbsp;' + moment(params.data[fi('actual_start_datetime')]).format('YYYY-MM-DD H:mm:ss') + '</p> ' 
                 }
-                if (params.data[fi('status')]  === 'Complete' || params.data[fi('status')]  === 'Closed') {
+                if (params.data[fi('status')]  === cons.STATE_COMPLETE || params.data[fi('status')]  === cons.STATE_CLOSE) {
                   tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Actual Start Time :</strong> &nbsp;' + moment(params.data[fi('actual_start_datetime')]).format('YYYY-MM-DD H:mm:ss') + '</p> ' 
                   tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Actual End Time :</strong> &nbsp;' + moment(params.data[fi('actual_end_datetime')]).format('YYYY-MM-DD H:mm:ss') + '</p> ' 
                 }
@@ -231,7 +232,7 @@ function renderGanttItem(params, api) {
   var x = timeArrival[0];
   var y = timeArrival[1] - barHeight;
 
-  var flightNumber = status === 'Changeover' ? 'C' : api.value(4) + ' - ' + pId.replace('###', '') + ''
+  var flightNumber = status === cons.STATE_CHANGEOVER ? 'C' : api.value(4) + ' - ' + pId.replace('###', '') + ''
   var flightNumberWidth = echarts.format.getTextRect(flightNumber).width;
   var text = (barLength > flightNumberWidth + 40 && x + barLength >= 180)
       ? flightNumber : '';
@@ -494,14 +495,14 @@ function initDrag(myChart){
     const orderData = _rawData.order.data;
     let movingItem = orderData[_draggingRecord.dataIndex];
     //Only Planned and Ready order can be moved.
-    if (movingItem[fi('status')] !== 'Planned' && movingItem[fi('status')] !== 'Ready') { return }
+    if (movingItem[fi('status')] !== cons.STATE_PLAN && movingItem[fi('status')] !== cons.STATE_READY) { return }
     
     // Check if hits anthoer order
     for (let i = 0; i < orderData.length; i++) {
       const dataItem = orderData[i];
       
       //if the dragging item is overlapped with changeover, return
-      if (dataItem[fi('status')] === 'Changeover') { return }
+      if (dataItem[fi('status')] === cons.STATE_CHANGEOVER) { return }
       
       //if hits another order, show form
       if (dataItem !== movingItem
@@ -620,7 +621,7 @@ function setListeners(myChart){
 
   myChart.on('click', params => {
     if (!_draggable) {
-      if (params.data[fi('status')] !== 'Changeover') {
+      if (params.data[fi('status')] !== cons.STATE_CHANGEOVER) {
         order_actions.showOrderActions(utils.mergeKeyVal(params.data, _rawData.order.dimensions))
       }
     }

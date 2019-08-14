@@ -165,5 +165,10 @@ function componentToHex(c){
   return hex.length === 1 ? "0" + hex : hex;
 }
 
+export const sure = promise => 
+  promise
+  .then(data => ({ok: true, data}))
+  .catch(error => Promise.resolve({ok: false, error}));
+
 
 

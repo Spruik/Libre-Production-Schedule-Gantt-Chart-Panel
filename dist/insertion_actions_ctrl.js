@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['./utils', './influx_helper', './data_processor', './instant_search_ctrl', 'moment', './chart_option'], function (_export, _context) {
+System.register(['./utils', './influx_helper', './data_processor', './instant_search_ctrl', './order_actions_ctrl', 'moment', './chart_option'], function (_export, _context) {
   "use strict";
 
-  var utils, influx, dp, instant_search, moment, chart, _isInsertingBefore, _targetOrder, _products, _tryCatchCounter, closeForm;
+  var utils, influx, dp, instant_search, orderActions, moment, chart, _isInsertingBefore, _targetOrder, _products, _tryCatchCounter, closeForm;
 
   function _toConsumableArray(arr) {
     if (Array.isArray(arr)) {
@@ -162,7 +162,7 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
     var changeover = data[7].value;
     var qty = data[1].value;
     var rate = data[5].value;
-    var order_duration = parseInt(qty, 10) / parseInt(rate, 10);
+    var order_duration = Number(parseFloat(qty).toFixed(2)) / Number((parseFloat(rate) * 60).toFixed(2));
     var startTime = moment(_isInsertingBefore ? calcStartTime(_targetOrder) : _targetOrder.endTime).add(moment.duration(changeover)).valueOf();
     var endTime = moment(_isInsertingBefore ? calcStartTime(_targetOrder) : _targetOrder.endTime).add(moment.duration(changeover)).add(order_duration, 'hours').valueOf();
 
@@ -209,8 +209,17 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
     //promises for later requests
     var promises = [];
 
+    // get initState from the database state model config table
+    var initState = orderActions.getOrderStates().filter(function (x) {
+      return x.is_init_state;
+    });
+    if (!initState[0] || !initState[0].state) {
+      utils.alert('error', 'Error', 'Initial State NOT Found from the state model config table, please specify an Initial State before creating order');
+      return;
+    }
+
     //update the inserting order first
-    var line = influx.writeLineForCreate(inputValues);
+    var line = influx.writeLineForCreate(inputValues, initState[0].state);
     promises.push(utils.post(influx.writeUrl, line));
 
     //loop thro the ordersBeingAffected to update all orders being affected
@@ -330,7 +339,7 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
    */
   function updateDuration(qty, rate) {
     if (qty !== "" && rate !== "") {
-      var durationHrs = parseInt(qty) / parseInt(rate);
+      var durationHrs = Number(parseFloat(qty).toFixed(2)) / Number((parseFloat(rate) * 60).toFixed(2));
       var momentDuration = moment.duration(durationHrs, 'hours');
 
       var durationText = getDurationText(momentDuration);
@@ -392,6 +401,8 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
       dp = _data_processor;
     }, function (_instant_search_ctrl) {
       instant_search = _instant_search_ctrl;
+    }, function (_order_actions_ctrl) {
+      orderActions = _order_actions_ctrl;
     }, function (_moment) {
       moment = _moment.default;
     }, function (_chart_option) {

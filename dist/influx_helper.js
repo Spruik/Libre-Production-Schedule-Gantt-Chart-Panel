@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['./utils', 'moment'], function (_export, _context) {
+System.register(['./utils', './constans', 'moment'], function (_export, _context) {
   "use strict";
 
-  var utils, moment, writeUrl, hasTurnedAround;
+  var utils, cons, moment, writeUrl, hasTurnedAround;
 
 
   /**
@@ -46,7 +46,7 @@ System.register(['./utils', 'moment'], function (_export, _context) {
 
   _export('writeLineForUpdate', writeLineForUpdate);
 
-  function writeLineForCreate(data) {
+  function writeLineForCreate(data, initState) {
     var product_id = data.product.split(' | ')[0];
     var product_desc = data.product.split(' | ')[1];
 
@@ -54,7 +54,7 @@ System.register(['./utils', 'moment'], function (_export, _context) {
     product_desc = product_desc.split(' ').join('\\ ');
 
     var line = writeTags(data.orderId, product_id, product_desc);
-    line += 'order_state="' + 'Planned' + '"' + ',';
+    line += 'order_state="' + initState + '"' + ',';
     line += 'order_date="' + data.date + '"' + ',';
     line += 'production_line="' + data.productionLine + '"' + ',';
     line += 'planned_changeover_time="' + data.changeover + '"' + ',';
@@ -251,6 +251,8 @@ System.register(['./utils', 'moment'], function (_export, _context) {
   return {
     setters: [function (_utils) {
       utils = _utils;
+    }, function (_constans) {
+      cons = _constans;
     }, function (_moment) {
       moment = _moment.default;
     }],

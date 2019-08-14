@@ -1,4 +1,5 @@
 import * as utils from './utils'
+import * as cons from './constans'
 import moment from 'moment'
 
 export const writeUrl = utils.influxHost + 'write?db=smart_factory'
@@ -43,7 +44,7 @@ export function writeLineForUpdate (status, data) {
   return line
 }
 
-export function writeLineForCreate (data) {
+export function writeLineForCreate (data, initState) {
   const product_id = data.product.split(' | ')[0]
   let product_desc = data.product.split(' | ')[1]
 
@@ -51,7 +52,7 @@ export function writeLineForCreate (data) {
   product_desc = product_desc.split(' ').join('\\ ')
 
   let line = writeTags(data.orderId, product_id, product_desc)
-  line += 'order_state="' + 'Planned' + '"' + ','
+  line += 'order_state="' + initState + '"' + ','
   line += 'order_date="' + data.date + '"' + ','
   line += 'production_line="' + data.productionLine + '"' + ','
   line += 'planned_changeover_time="' + data.changeover + '"' + ','

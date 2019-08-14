@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['./utils', 'moment', './chart_ctrl'], function (_export, _context) {
+System.register(['./utils', './constans', 'moment', './chart_ctrl'], function (_export, _context) {
   "use strict";
 
-  var utils, moment, chartCtrl, _order_data, _order_dimensions;
+  var utils, cons, moment, chartCtrl, _order_data, _order_dimensions;
 
   /**
    * Expecting columns names, and rows values
@@ -90,7 +90,7 @@ System.register(['./utils', 'moment', './chart_ctrl'], function (_export, _conte
 
     //categorise the order_data, group by line, and in each lineGroup, group by date
     var categorisedOrders = categoriseByLineAndDate(order_data, 'array', data);
-
+    //console.log(categorisedOrders)
     var promises = [];
     for (var _i2 = 0; _i2 < categorisedOrders.length; _i2++) {
       var lineGroup = categorisedOrders[_i2];
@@ -136,10 +136,12 @@ System.register(['./utils', 'moment', './chart_ctrl'], function (_export, _conte
             var changeover = utils.copyObject(order);
             changeover[2] = startTime; // changeover's end time = main order's start time
             changeover[1] = changeover_startTime.valueOf(); // changeover's start time = it's end time - it's changeover time
-            changeover[8] = 'Changeover'; // set statuts to be changeover
+            changeover[8] = cons.STATE_CHANGEOVER; // set statuts to be changeover
             order_data.push(changeover);
           }
         }
+
+        //console.log(dateGroupWithoutTime)
 
         //loop thro the date group containing orders that are with NO time
         for (var o = 0; o < dateGroupWithoutTime.length; o++) {
@@ -153,7 +155,8 @@ System.register(['./utils', 'moment', './chart_ctrl'], function (_export, _conte
 
           //get startTime, then calc the order's duration based on qty and rate, then calc the endTime
           var currentStartTime = _startTime.valueOf();
-          var duration = _order[findIndex('order_qty', order_dimensions)] / _order[findIndex('planned_rate', order_dimensions)];
+          var duration = _order[findIndex('order_qty', order_dimensions)] / (_order[findIndex('planned_rate', order_dimensions)] * 60);
+          console.log(duration);
           var _endTime = _startTime.add(duration, 'hours');
 
           //handle changeover
@@ -165,7 +168,7 @@ System.register(['./utils', 'moment', './chart_ctrl'], function (_export, _conte
             var _changeover = utils.copyObject(_order);
             _changeover[1] = currentStartTime; // changeover's start time = current start time
             _changeover[2] = moment(currentStartTime).add(_changeover_duration).valueOf(); // changeover's end time = main order's start time
-            _changeover[8] = 'Changeover'; // set statuts to be changeover
+            _changeover[8] = cons.STATE_CHANGEOVER; // set statuts to be changeover
 
             order_data.push(_changeover);
 
@@ -305,29 +308,29 @@ System.register(['./utils', 'moment', './chart_ctrl'], function (_export, _conte
 
   function getColor(status) {
     var color = void 0;
-    switch (status) {
-      case 'Changeover':
+    switch (status.toLowerCase()) {
+      case cons.STATE_CHANGEOVER:
         color = '#c9c52a';
         break;
-      case 'Planned':
+      case cons.STATE_PLAN:
         color = '#c9c9c9';
         break;
-      case 'Ready':
+      case cons.STATE_READY:
         color = '#CCFFAF';
         break;
-      case 'Next':
+      case cons.STATE_FLAG:
         color = '#FFFB85';
         break;
-      case 'Paused':
+      case cons.STATE_PAUSE:
         color = '#E8B20C';
         break;
-      case 'Complete':
+      case cons.STATE_COMPLETE:
         color = '#70C6FF';
         break;
-      case 'Closed':
+      case cons.STATE_CLOSE:
         color = '#FF7773';
         break;
-      case 'Running':
+      case cons.STATE_START:
         color = '#91F449';
         break;
       default:
@@ -341,7 +344,7 @@ System.register(['./utils', 'moment', './chart_ctrl'], function (_export, _conte
 
   function getData() {
     return utils.mergeKeyArrayVal(_order_data, _order_dimensions).filter(function (order) {
-      return order.status !== 'Changeover';
+      return order.status.toLowerCase() !== cons.STATE_CHANGEOVER;
     });
   }
 
@@ -350,6 +353,8 @@ System.register(['./utils', 'moment', './chart_ctrl'], function (_export, _conte
   return {
     setters: [function (_utils) {
       utils = _utils;
+    }, function (_constans) {
+      cons = _constans;
     }, function (_moment) {
       moment = _moment.default;
     }, function (_chart_ctrl) {

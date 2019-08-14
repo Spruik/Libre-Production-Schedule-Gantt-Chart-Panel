@@ -1,9 +1,9 @@
 'use strict';
 
-System.register(['./utils', './influx_helper', './data_processor', './instant_search_ctrl', 'moment', './chart_option'], function (_export, _context) {
+System.register(['./utils', './influx_helper', './data_processor', './instant_search_ctrl', './constans', 'moment', './chart_option'], function (_export, _context) {
   "use strict";
 
-  var utils, influx, dp, instant_search, moment, chart, _targetOrder, _ordersBeingAffected, _tryCatchCounter, _products, _equipment, closeForm;
+  var utils, influx, dp, instant_search, cons, moment, chart, _targetOrder, _ordersBeingAffected, _tryCatchCounter, _products, _equipment, closeForm;
 
   function _toConsumableArray(arr) {
     if (Array.isArray(arr)) {
@@ -218,7 +218,7 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
     var nextDayStartTime = moment(targetDayStartTimeText, 'YYYY-MM-DD H:mm:ss').add(1, 'days');
 
     //calc edited order's duration
-    var duration = moment.duration(inputValues.orderQty / inputValues.plannedRate, 'hours');
+    var duration = moment.duration(inputValues.orderQty / (inputValues.plannedRate * 60), 'hours');
     var changeover = moment.duration(inputValues.changeover, 'H:mm:ss');
     var totalDur = duration.add(changeover);
 
@@ -270,12 +270,12 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
     //The difference between the original changeover and the edited changeover
     var changeoverDiff = moment.duration(inputValues.changeover).subtract(moment.duration(_targetOrder.planned_changeover_time));
     var startTime = moment(originalStartTime).add(changeoverDiff);
-    var duration = moment.duration(inputValues.orderQty / inputValues.plannedRate, 'hours');
+    var duration = moment.duration(inputValues.orderQty / (inputValues.plannedRate * 60), 'hours');
     var endTime = moment(originalStartTime).add(changeoverDiff).add(duration);
 
     //calc the difference between the edited order's total duration and the original order's total duration
     //so that all the affected orders know how many to add/subtract
-    var oldTotal = moment.duration(_targetOrder.order_qty / _targetOrder.planned_rate, 'hours').add(moment.duration(_targetOrder.planned_changeover_time));
+    var oldTotal = moment.duration(_targetOrder.order_qty / (_targetOrder.planned_rate * 60), 'hours').add(moment.duration(_targetOrder.planned_changeover_time));
     var newTotal = duration.add(moment.duration(inputValues.changeover));
     var difference = oldTotal.subtract(newTotal);
 
@@ -319,14 +319,14 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
    */
   function getDiff(inputValues) {
     var diff = void 0;
-    var duration = moment.duration(inputValues.orderQty / inputValues.plannedRate, 'hours');
+    var duration = moment.duration(inputValues.orderQty / (inputValues.plannedRate * 60), 'hours');
     var changeover = moment.duration(inputValues.changeover, 'H:mm:ss');
     diff = duration.add(changeover);
     return diff;
   }
 
   function updateOldAndNewOrders(inputValues) {
-    var line = influx.writeLineForUpdate('Replaced', _targetOrder);
+    var line = influx.writeLineForUpdate(cons.STATE_REPLACED, _targetOrder);
     utils.post(influx.writeUrl, line).then(function (res) {
       //save the new order directly with removing its starttime and endtime to let the initialiser to init it again
       //becuase this is the first
@@ -431,7 +431,7 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
   function updateDuration(qty, rate) {
 
     if (qty !== "" && rate !== "") {
-      var durationHrs = parseInt(qty) / parseInt(rate);
+      var durationHrs = Number(parseFloat(qty).toFixed(2)) / Number((parseFloat(rate) * 60).toFixed(2));
       var momentDuration = moment.duration(durationHrs, 'hours');
       var durationText = getDurationText(momentDuration);
       $('input.prod-sche-gt-chart-datalist-input#duration').val(durationText);
@@ -497,6 +497,8 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
       dp = _data_processor;
     }, function (_instant_search_ctrl) {
       instant_search = _instant_search_ctrl;
+    }, function (_constans) {
+      cons = _constans;
     }, function (_moment) {
       moment = _moment.default;
     }, function (_chart_option) {

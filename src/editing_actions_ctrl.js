@@ -2,6 +2,7 @@ import * as utils from './utils'
 import * as influx from './influx_helper'
 import * as dp from './data_processor'
 import * as instant_search from './instant_search_ctrl'
+import * as cons from './constans'
 import moment from 'moment'
 import * as chart from './chart_option'
 
@@ -208,7 +209,7 @@ function isLineHavingSpareTimeForTheDay(allData, inputValues, targetOrder){
   const nextDayStartTime = moment(targetDayStartTimeText, 'YYYY-MM-DD H:mm:ss').add(1, 'days')
 
   //calc edited order's duration
-  const duration = moment.duration(inputValues.orderQty / inputValues.plannedRate, 'hours')
+  const duration = moment.duration(inputValues.orderQty / (inputValues.plannedRate * 60), 'hours')
   const changeover = moment.duration(inputValues.changeover, 'H:mm:ss')
   const totalDur = duration.add(changeover)
 
@@ -258,12 +259,12 @@ function updateWithChanging(inputValues) {
   //The difference between the original changeover and the edited changeover
   const changeoverDiff = moment.duration(inputValues.changeover).subtract(moment.duration(_targetOrder.planned_changeover_time))
   const startTime = moment(originalStartTime).add(changeoverDiff)
-  const duration = moment.duration(inputValues.orderQty / inputValues.plannedRate, 'hours')
+  const duration = moment.duration(inputValues.orderQty / (inputValues.plannedRate * 60), 'hours')
   const endTime = moment(originalStartTime).add(changeoverDiff).add(duration)
 
   //calc the difference between the edited order's total duration and the original order's total duration
   //so that all the affected orders know how many to add/subtract
-  const oldTotal = moment.duration(_targetOrder.order_qty / _targetOrder.planned_rate, 'hours').add(moment.duration(_targetOrder.planned_changeover_time))
+  const oldTotal = moment.duration(_targetOrder.order_qty / (_targetOrder.planned_rate * 60), 'hours').add(moment.duration(_targetOrder.planned_changeover_time))
   const newTotal = duration.add(moment.duration(inputValues.changeover))
   const difference = oldTotal.subtract(newTotal)
   
@@ -307,14 +308,14 @@ function updateAffectedOrders(inputValues, difference) {
  */
 function getDiff(inputValues){
   let diff
-  const duration = moment.duration(inputValues.orderQty / inputValues.plannedRate, 'hours')
+  const duration = moment.duration(inputValues.orderQty / (inputValues.plannedRate * 60), 'hours')
   const changeover = moment.duration(inputValues.changeover, 'H:mm:ss')
   diff = duration.add(changeover)
   return diff
 }
 
 function updateOldAndNewOrders(inputValues){
-  const line = influx.writeLineForUpdate('Replaced', _targetOrder)
+  const line = influx.writeLineForUpdate(cons.STATE_REPLACED, _targetOrder)
   utils.post(influx.writeUrl, line).then(res => {
     //save the new order directly with removing its starttime and endtime to let the initialiser to init it again
     //becuase this is the first
@@ -423,7 +424,7 @@ function isValueValid(data) {
 function updateDuration(qty, rate){
 
   if (qty !== "" && rate !== "") {
-    let durationHrs = parseInt(qty) / parseInt(rate)
+    let durationHrs = Number(parseFloat(qty).toFixed(2)) / Number((parseFloat(rate) * 60).toFixed(2))
     let momentDuration = moment.duration(durationHrs, 'hours')
     let durationText = getDurationText(momentDuration)
     $('input.prod-sche-gt-chart-datalist-input#duration').val(durationText)

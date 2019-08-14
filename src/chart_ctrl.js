@@ -5,6 +5,7 @@ import $ from 'jquery'
 import * as dp from './data_processor'
 import * as chart from './chart_option'
 import * as utils from './utils'
+import * as cons from './constans'
 import echarts from './libs/echarts.min'
 import {MetricsPanelCtrl} from 'app/plugins/sdk'
 
@@ -71,6 +72,7 @@ export class ChartCtrl extends MetricsPanelCtrl {
   }
 
   onDataReceived(dataList) {    
+    //console.log('o', utils.copyObject(dataList))
     if (dataList.length === 0 || dataList === null || dataList === undefined) {
       // console.log('No data reveived')
       this.hasData = false
@@ -116,7 +118,7 @@ export class ChartCtrl extends MetricsPanelCtrl {
     let rows = dataList[0].rows
     rows = rows.filter(row => {
       const lowerCaseRow = row.map(elem => (typeof elem === 'string') ? elem.toLowerCase() : elem)
-      if (lowerCaseRow.indexOf('replaced') === -1 && lowerCaseRow.indexOf('deleted') === -1) {
+      if (lowerCaseRow.indexOf(cons.STATE_REPLACED) === -1 && lowerCaseRow.indexOf(cons.STATE_DELETED) === -1) {
         if (!row[10]) { return row } // at the first time the start time will be null, let it in for now, and the time will be assigned, which will be examined later
         const scheduledStartTimeTimeStamp = row[10] // the scheduled start time is the 10th elem
         const scheduledStartTime = moment(scheduledStartTimeTimeStamp) // moment shcedule start time
@@ -129,6 +131,7 @@ export class ChartCtrl extends MetricsPanelCtrl {
       }
     })
     dataList[0].rows = rows
+    //console.log('d', dataList)
     return dataList
   }
 

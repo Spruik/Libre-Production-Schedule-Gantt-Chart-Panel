@@ -1,4 +1,5 @@
 import * as utils from './utils'
+import * as cons from './constans'
 import moment from 'moment'
 import * as chartCtrl from './chart_ctrl'
 
@@ -84,7 +85,7 @@ function tailorData(data, rowCols) {
 
   //categorise the order_data, group by line, and in each lineGroup, group by date
   const categorisedOrders = categoriseByLineAndDate(order_data, 'array', data)
-  
+  //console.log(categorisedOrders)
   let promises = []
   for (let i = 0; i < categorisedOrders.length; i++) {
     const lineGroup = categorisedOrders[i]
@@ -125,10 +126,12 @@ function tailorData(data, rowCols) {
           let changeover = utils.copyObject(order)
           changeover[2] = startTime // changeover's end time = main order's start time
           changeover[1] = changeover_startTime.valueOf() // changeover's start time = it's end time - it's changeover time
-          changeover[8] = 'Changeover' // set statuts to be changeover
+          changeover[8] = cons.STATE_CHANGEOVER // set statuts to be changeover
           order_data.push(changeover)
         }
       }
+
+      //console.log(dateGroupWithoutTime)
 
       //loop thro the date group containing orders that are with NO time
       for (let o = 0; o < dateGroupWithoutTime.length; o++) {
@@ -142,7 +145,8 @@ function tailorData(data, rowCols) {
 
         //get startTime, then calc the order's duration based on qty and rate, then calc the endTime
         let currentStartTime = _startTime.valueOf()
-        let duration = order[findIndex('order_qty',order_dimensions)] / order[findIndex('planned_rate',order_dimensions)]
+        let duration = order[findIndex('order_qty',order_dimensions)] / (order[findIndex('planned_rate',order_dimensions)] * 60)
+        console.log(duration)
         let _endTime = _startTime.add(duration, 'hours')
 
         //handle changeover
@@ -154,7 +158,7 @@ function tailorData(data, rowCols) {
           let changeover = utils.copyObject(order)
           changeover[1] = currentStartTime // changeover's start time = current start time
           changeover[2] = moment(currentStartTime).add(changeover_duration).valueOf() // changeover's end time = main order's start time
-          changeover[8] = 'Changeover' // set statuts to be changeover
+          changeover[8] = cons.STATE_CHANGEOVER // set statuts to be changeover
 
           order_data.push(changeover)
 
@@ -280,29 +284,29 @@ function writeLine(data){
 
 export function getColor(status){
   let color
-  switch (status) {
-    case 'Changeover':
+  switch (status.toLowerCase()) {
+    case cons.STATE_CHANGEOVER:
       color = '#c9c52a'
       break;
-    case 'Planned':
+    case cons.STATE_PLAN:
       color = '#c9c9c9'
       break;
-    case 'Ready':
+    case cons.STATE_READY:
       color = '#CCFFAF'
       break;
-    case 'Next':
+    case cons.STATE_FLAG:
       color = '#FFFB85'
       break;
-    case 'Paused':
+    case cons.STATE_PAUSE:
       color = '#E8B20C'
       break;
-    case 'Complete':
+    case cons.STATE_COMPLETE:
       color = '#70C6FF'
       break;
-    case 'Closed':
+    case cons.STATE_CLOSE:
       color = '#FF7773'
       break;
-    case 'Running':
+    case cons.STATE_START:
       color = '#91F449'
       break;
     default:
@@ -313,5 +317,5 @@ export function getColor(status){
 }
 
 export function getData(){
-  return utils.mergeKeyArrayVal(_order_data, _order_dimensions).filter(order => order.status !== 'Changeover')
+  return utils.mergeKeyArrayVal(_order_data, _order_dimensions).filter(order => order.status.toLowerCase() !== cons.STATE_CHANGEOVER)
 }

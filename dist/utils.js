@@ -3,7 +3,7 @@
 System.register(['app/core/core'], function (_export, _context) {
   "use strict";
 
-  var appEvents, hostname, influxHost, postgRestHost, _prodLineDetails, get, post, alert, showModal, copyObject;
+  var appEvents, hostname, influxHost, postgRestHost, _prodLineDetails, get, post, alert, showModal, copyObject, sure;
 
   function sortMax(data) {
     return data.sort(function (a, b) {
@@ -119,6 +119,7 @@ System.register(['app/core/core'], function (_export, _context) {
     var hex = c.toString(16);
     return hex.length === 1 ? "0" + hex : hex;
   }
+
   return {
     setters: [function (_appCoreCore) {
       appEvents = _appCoreCore.appEvents;
@@ -213,6 +214,16 @@ System.register(['app/core/core'], function (_export, _context) {
       });
 
       _export('copyObject', copyObject);
+
+      _export('sure', sure = function sure(promise) {
+        return promise.then(function (data) {
+          return { ok: true, data: data };
+        }).catch(function (error) {
+          return Promise.resolve({ ok: false, error: error });
+        });
+      });
+
+      _export('sure', sure);
     }
   };
 });

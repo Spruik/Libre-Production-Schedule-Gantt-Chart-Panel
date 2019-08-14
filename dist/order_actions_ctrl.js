@@ -1,16 +1,16 @@
 'use strict';
 
-System.register(['./utils', './influx_helper', './insertion_actions_ctrl', './editing_actions_ctrl', './data_processor', 'moment', './chart_option'], function (_export, _context) {
+System.register(['./utils', './influx_helper', './insertion_actions_ctrl', './editing_actions_ctrl', './data_processor', './constans', 'moment', './chart_option'], function (_export, _context) {
   "use strict";
 
-  var utils, influx, insert_actions, edit_actions, dp, moment, chart, _order, closeForm;
+  var utils, influx, insert_actions, edit_actions, dp, cons, moment, chart, _order, _orderStates, closeForm;
 
   function showOrderActions(order) {
     //set the order passed in global
     _order = order;
 
     //check if the order is available for editing, only 'planned' and 'ready' can be edited by scheduler
-    if (order.status !== 'Planned' && order.status !== 'Ready') {
+    if (order.status !== cons.STATE_PLAN && order.status !== cons.STATE_READY) {
       utils.alert('warning', 'Warning', 'The order status is ' + order.status + ', so it is no longer available for editing');
       return;
     }
@@ -36,25 +36,45 @@ System.register(['./utils', './influx_helper', './insertion_actions_ctrl', './ed
       } else if (e.target.id === 'edit') {
         editOrder();
       } else if (e.target.id === 'release') {
-        if (_order.status === 'Ready') {
+        if (_order.status === cons.STATE_READY) {
           utils.alert('warning', 'Warning', 'Order has already been released');
           closeForm();
         } else {
-          updateOrderStatus('Ready');
+          updateOrderStatus(cons.STATE_READY);
         }
       } else if (e.target.id === 'delete') {
-        updateOrderStatus('Deleted');
+        updateOrderStatus(cons.STATE_DELETED);
       }
     });
   }
 
-  function insertOrder() {
-    insert_actions.showActions(_order);
+  async function insertOrder() {
+    var url = utils.postgRestHost + 'order_state';
+    var result = await utils.sure(utils.get(url));
+    if (result.ok) {
+      _orderStates = result.data;
+      insert_actions.showActions(_order);
+    } else {
+      utils.alert('error', 'Error', 'Error occurred when getting the Order State Configuration due to ' + result.error + ' please try again or contact the dev team');
+    }
   }
 
-  function editOrder() {
-    edit_actions.showActions(_order);
+  async function editOrder() {
+    var url = utils.postgRestHost + 'order_state';
+    var result = await utils.sure(utils.get(url));
+    if (result.ok) {
+      _orderStates = result.data;
+      edit_actions.showActions(_order);
+    } else {
+      utils.alert('error', 'Error', 'Error occurred when getting the Order State Configuration due to ' + result.error + ' please try again or contact the dev team');
+    }
   }
+
+  function getOrderStates() {
+    return _orderStates;
+  }
+
+  _export('getOrderStates', getOrderStates);
 
   function updateOrderStatus(status) {
     var line = influx.writeLineForUpdate(status, _order);
@@ -86,7 +106,7 @@ System.register(['./utils', './influx_helper', './insertion_actions_ctrl', './ed
     });
 
     //work out thisOrder's total duration, which = its duration + its changeover duration
-    var deletingOrderDurationHour = moment.duration(_order.order_qty / _order.planned_rate, 'hours');
+    var deletingOrderDurationHour = moment.duration(_order.order_qty / (_order.planned_rate * 60), 'hours');
     var deletingOrderChangeover = moment.duration(_order.planned_changeover_time, 'H:mm:ss');
     var deletingOrderTotalDur = deletingOrderDurationHour.add(deletingOrderChangeover);
 
@@ -116,6 +136,8 @@ System.register(['./utils', './influx_helper', './insertion_actions_ctrl', './ed
       edit_actions = _editing_actions_ctrl;
     }, function (_data_processor) {
       dp = _data_processor;
+    }, function (_constans) {
+      cons = _constans;
     }, function (_moment) {
       moment = _moment.default;
     }, function (_chart_option) {
@@ -123,6 +145,7 @@ System.register(['./utils', './influx_helper', './insertion_actions_ctrl', './ed
     }],
     execute: function () {
       _order = void 0;
+      _orderStates = void 0;
 
       closeForm = function closeForm() {
         return $('a#product-schedule-gantt-chart-order-actions-close-btn').trigger('click');

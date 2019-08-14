@@ -2,6 +2,7 @@ import * as utils from './utils'
 import * as influx from './influx_helper'
 import * as dp from './data_processor'
 import * as instant_search from './instant_search_ctrl'
+import * as orderActions from './order_actions_ctrl'
 import moment from 'moment'
 import * as chart from './chart_option'
 
@@ -156,7 +157,7 @@ function submitOrder(data){
   const changeover = data[7].value
   const qty = data[1].value
   const rate = data[5].value
-  const order_duration = parseInt(qty, 10) / parseInt(rate, 10)
+  const order_duration = Number(parseFloat(qty).toFixed(2)) / Number((parseFloat(rate) * 60).toFixed(2))
   const startTime = moment(_isInsertingBefore ? calcStartTime(_targetOrder) : _targetOrder.endTime).add(moment.duration(changeover)).valueOf()
   const endTime = moment(_isInsertingBefore ? calcStartTime(_targetOrder) : _targetOrder.endTime).add(moment.duration(changeover)).add(order_duration, 'hours').valueOf()
   
@@ -202,8 +203,15 @@ function insertOrder(inputValues, allData){
   //promises for later requests
   let promises = []
 
+  // get initState from the database state model config table
+  const initState = orderActions.getOrderStates().filter(x => x.is_init_state)
+  if (!initState[0] || !initState[0].state) {
+    utils.alert('error', 'Error', `Initial State NOT Found from the state model config table, please specify an Initial State before creating order`)
+    return
+  }
+  
   //update the inserting order first
-  const line = influx.writeLineForCreate(inputValues)
+  const line = influx.writeLineForCreate(inputValues, initState[0].state)
   promises.push(utils.post(influx.writeUrl, line))
 
   //loop thro the ordersBeingAffected to update all orders being affected
@@ -321,7 +329,7 @@ function isLineHavingSpareTimeForTheDay(ordersAffected, insertingOrderDuration, 
  */
 function updateDuration(qty, rate){
   if (qty !== "" && rate !== "") {
-    let durationHrs = parseInt(qty) / parseInt(rate)
+    let durationHrs = Number(parseFloat(qty).toFixed(2)) / Number((parseFloat(rate) * 60).toFixed(2))
     let momentDuration = moment.duration(durationHrs, 'hours')
 
     let durationText = getDurationText(momentDuration)

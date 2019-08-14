@@ -3,10 +3,12 @@ import * as influx from './influx_helper'
 import * as insert_actions from './insertion_actions_ctrl'
 import * as edit_actions from './editing_actions_ctrl'
 import * as dp from './data_processor'
+import * as cons from './constans'
 import moment from 'moment'
 import * as chart from './chart_option'
 
 let _order
+let _orderStates
 const closeForm = () => $('a#product-schedule-gantt-chart-order-actions-close-btn').trigger('click')
 
 export function showOrderActions(order){
@@ -14,7 +16,7 @@ export function showOrderActions(order){
   _order = order
 
   //check if the order is available for editing, only 'planned' and 'ready' can be edited by scheduler
-  if (order.status !== 'Planned' && order.status !== 'Ready') {
+  if (order.status !== cons.STATE_PLAN && order.status !== cons.STATE_READY) {
     utils.alert('warning', 'Warning', 'The order status is ' + order.status + ', so it is no longer available for editing')
     return
   }
@@ -38,24 +40,42 @@ function addListeners(){
     }else if (e.target.id === 'edit') {
       editOrder()
     }else if (e.target.id === 'release') {
-      if (_order.status === 'Ready') {
+      if (_order.status === cons.STATE_READY) {
         utils.alert('warning', 'Warning', 'Order has already been released')
         closeForm()
       }else{
-        updateOrderStatus('Ready')
+        updateOrderStatus(cons.STATE_READY)
       }
     }else if (e.target.id === 'delete') {
-      updateOrderStatus('Deleted')
+      updateOrderStatus(cons.STATE_DELETED)
     }
   })
 }
 
-function insertOrder(){
-  insert_actions.showActions(_order)
+async function insertOrder(){
+  const url = `${utils.postgRestHost}order_state`
+  const result = await utils.sure(utils.get(url))
+  if (result.ok) {
+    _orderStates = result.data
+    insert_actions.showActions(_order)
+  }else {
+    utils.alert('error', 'Error', `Error occurred when getting the Order State Configuration due to ${result.error} please try again or contact the dev team`)
+  }
 }
 
-function editOrder(){
-  edit_actions.showActions(_order)
+async function editOrder(){
+  const url = `${utils.postgRestHost}order_state`
+  const result = await utils.sure(utils.get(url))
+  if (result.ok) {
+    _orderStates = result.data
+    edit_actions.showActions(_order)
+  }else {
+    utils.alert('error', 'Error', `Error occurred when getting the Order State Configuration due to ${result.error} please try again or contact the dev team`)
+  }
+}
+
+export function getOrderStates(){
+  return _orderStates
 }
 
 function updateOrderStatus(status){
@@ -87,7 +107,7 @@ function deleteCurrentAndUpdateAffectOrders(line){
   const affectedOrders = allData.filter(order => order.startTime >= _order.endTime && order.production_line === _order.production_line && order.order_date === _order.order_date)
   
   //work out thisOrder's total duration, which = its duration + its changeover duration
-  const deletingOrderDurationHour = moment.duration(_order.order_qty / _order.planned_rate, 'hours') 
+  const deletingOrderDurationHour = moment.duration(_order.order_qty / (_order.planned_rate * 60), 'hours') 
   const deletingOrderChangeover = moment.duration(_order.planned_changeover_time, 'H:mm:ss')
   const deletingOrderTotalDur = deletingOrderDurationHour.add(deletingOrderChangeover)
   
