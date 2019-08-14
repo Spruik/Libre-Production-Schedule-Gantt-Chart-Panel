@@ -29,6 +29,12 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
     if (data.setpoint_rate !== null && data.setpoint_rate !== undefined) {
       line += 'setpoint_rate=' + data.setpoint_rate + ',';
     }
+    if (data.actual_start_datetime !== null && data.actual_start_datetime !== undefined) {
+      line += 'actual_start_datetime=' + data.actual_start_datetime + ',';
+    }
+    if (data.actual_end_datetime !== null && data.actual_end_datetime !== undefined) {
+      line += 'actual_end_datetime=' + data.actual_end_datetime + ',';
+    }
 
     line += 'order_state="' + status + '"' + ',';
     line += 'order_date="' + data.order_date + '"' + ',';
@@ -116,6 +122,12 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
     if (data.setpoint_rate !== null && data.setpoint_rate !== undefined) {
       line += 'setpoint_rate=' + data.setpoint_rate + ',';
     }
+    if (data.actual_start_datetime !== null && data.actual_start_datetime !== undefined) {
+      line += 'actual_start_datetime=' + data.actual_start_datetime + ',';
+    }
+    if (data.actual_end_datetime !== null && data.actual_end_datetime !== undefined) {
+      line += 'actual_end_datetime=' + data.actual_end_datetime + ',';
+    }
 
     line += 'order_state="' + data.status + '"' + ',';
     line += 'order_date="' + data.order_date + '"' + ',';
@@ -127,7 +139,6 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
     line += 'planned_rate=' + data.planned_rate;
 
     // console.log('writeLineForTimeUpdate');
-    // console.log(line);
     return line;
   }
 
@@ -141,6 +152,21 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
     product_desc = product_desc.split(' ').join('\\ ');
 
     var line = writeTags(data.orderId, product_id, product_desc);
+    if (data.compl_qty !== null && data.compl_qty !== undefined) {
+      line += 'compl_qty=' + data.compl_qty + ',';
+    }
+    if (data.machine_state !== null && data.machine_state !== undefined) {
+      line += 'machine_state="' + data.machine_state + '"' + ',';
+    }
+    if (data.scrap_qty !== null && data.scrap_qty !== undefined) {
+      line += 'scrap_qty=' + data.scrap_qty + ',';
+    }
+    if (data.actual_start_datetime !== null && data.actual_start_datetime !== undefined) {
+      line += 'actual_start_datetime=' + data.actual_start_datetime + ',';
+    }
+    if (data.actual_end_datetime !== null && data.actual_end_datetime !== undefined) {
+      line += 'actual_end_datetime=' + data.actual_end_datetime + ',';
+    }
     line += 'order_state="' + currentStatus + '"' + ',';
     line += 'order_date="' + data.date + '"' + ',';
     line += 'production_line="' + data.productionLine + '"' + ',';
@@ -148,7 +174,7 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
     line += 'order_qty=' + data.orderQty + ',';
     line += 'setpoint_rate=' + 0 + ',';
     line += 'planned_rate=' + data.plannedRate;
-
+    console.log('2');
     // console.log('writeLineForUpdateWithRemovingTime');
     // console.log(line);
     return line;
@@ -164,6 +190,21 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
     product_desc = product_desc.split(' ').join('\\ ');
 
     var line = writeTags(data.orderId, product_id, product_desc);
+    if (data.compl_qty !== null && data.compl_qty !== undefined) {
+      line += 'compl_qty=' + data.compl_qty + ',';
+    }
+    if (data.machine_state !== null && data.machine_state !== undefined) {
+      line += 'machine_state="' + data.machine_state + '"' + ',';
+    }
+    if (data.scrap_qty !== null && data.scrap_qty !== undefined) {
+      line += 'scrap_qty=' + data.scrap_qty + ',';
+    }
+    if (data.actual_start_datetime !== null && data.actual_start_datetime !== undefined) {
+      line += 'actual_start_datetime=' + data.actual_start_datetime + ',';
+    }
+    if (data.actual_end_datetime !== null && data.actual_end_datetime !== undefined) {
+      line += 'actual_end_datetime=' + data.actual_end_datetime + ',';
+    }
     line += 'order_state="' + currentStatus + '"' + ',';
     line += 'order_date="' + data.date + '"' + ',';
     line += 'production_line="' + data.productionLine + '"' + ',';
@@ -173,7 +214,7 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
     line += 'order_qty=' + data.orderQty + ',';
     line += 'setpoint_rate=' + 0 + ',';
     line += 'planned_rate=' + data.plannedRate;
-
+    console.log('3');
     // console.log('writeLineForUpdateWithChangingTime');
     // console.log(line);
     return line;
@@ -196,8 +237,11 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
     if (data.scrap_qty !== null && data.scrap_qty !== undefined) {
       line += 'scrap_qty=' + data.scrap_qty + ',';
     }
-    if (data.setpoint_rate !== null && data.setpoint_rate !== undefined) {
-      line += 'setpoint_rate=' + data.setpoint_rate + ',';
+    if (data.actual_start_datetime !== null && data.actual_start_datetime !== undefined) {
+      line += 'actual_start_datetime=' + data.actual_start_datetime + ',';
+    }
+    if (data.actual_end_datetime !== null && data.actual_end_datetime !== undefined) {
+      line += 'actual_end_datetime=' + data.actual_end_datetime + ',';
     }
 
     line += 'order_state="' + data.status + '"' + ',';
@@ -209,7 +253,7 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
     line += 'scheduled_start_datetime=' + startTime + ',';
     line += 'setpoint_rate=' + 0 + ',';
     line += 'planned_rate=' + data.planned_rate;
-
+    console.log('4');
     // console.log('writeLineForUpdateDragging');
     // console.log(line);
     return line;
