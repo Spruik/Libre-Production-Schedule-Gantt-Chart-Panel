@@ -1,6 +1,6 @@
 'use strict';
 
-System.register(['angular', 'moment', 'lodash', 'jquery', './data_processor', './chart_option', './utils', './constans', './libs/echarts.min', 'app/plugins/sdk', './css/style.css!', './css/bootstrap-slider.css!', './css/instant-search.css!'], function (_export, _context) {
+System.register(['angular', 'moment', 'lodash', 'jquery', './data_processor', './chart_option', './utils', './constans', './libs/echarts.min', 'app/plugins/sdk', './css/style.css!', './css/bootstrap-slider.css!', './css/instant-search.css!', './css/timepicker.css!', './css/datepicker.css!'], function (_export, _context) {
   "use strict";
 
   var angular, moment, _, $, dp, chart, utils, cons, echarts, MetricsPanelCtrl, _createClass, _get, _ctrl, panelDefaults, ChartCtrl;
@@ -62,7 +62,7 @@ System.register(['angular', 'moment', 'lodash', 'jquery', './data_processor', '.
       echarts = _libsEchartsMin.default;
     }, function (_appPluginsSdk) {
       MetricsPanelCtrl = _appPluginsSdk.MetricsPanelCtrl;
-    }, function (_cssStyleCss) {}, function (_cssBootstrapSliderCss) {}, function (_cssInstantSearchCss) {}],
+    }, function (_cssStyleCss) {}, function (_cssBootstrapSliderCss) {}, function (_cssInstantSearchCss) {}, function (_cssTimepickerCss) {}, function (_cssDatepickerCss) {}],
     execute: function () {
       _createClass = function () {
         function defineProperties(target, props) {
@@ -171,7 +171,7 @@ System.register(['angular', 'moment', 'lodash', 'jquery', './data_processor', '.
         }, {
           key: 'onDataReceived',
           value: function onDataReceived(dataList) {
-            //console.log('o', utils.copyObject(dataList))
+            console.log('o', utils.copyObject(dataList));
             if (dataList.length === 0 || dataList === null || dataList === undefined) {
               // console.log('No data reveived')
               this.hasData = false;
@@ -221,12 +221,12 @@ System.register(['angular', 'moment', 'lodash', 'jquery', './data_processor', '.
                 return typeof elem === 'string' ? elem.toLowerCase() : elem;
               });
               if (lowerCaseRow.indexOf(cons.STATE_REPLACED) === -1 && lowerCaseRow.indexOf(cons.STATE_DELETED) === -1) {
-                if (!row[10]) {
+                if (!row[8]) {
                   return row;
                 } // at the first time the start time will be null, let it in for now, and the time will be assigned, which will be examined later
-                var scheduledStartTimeTimeStamp = row[10]; // the scheduled start time is the 10th elem
+                var scheduledStartTimeTimeStamp = row[8]; // the scheduled start time is the 10th elem
                 var scheduledStartTime = moment(scheduledStartTimeTimeStamp); // moment shcedule start time
-                var changeover = moment.duration(row[9], 'H:mm:ss'); // moment changeover
+                var changeover = moment.duration(row[10], 'H:mm:ss'); // moment changeover
                 scheduledStartTime.subtract(changeover); // start time - changeover to have the initial time
                 if (scheduledStartTime.isSameOrAfter(from) && scheduledStartTime.isSameOrBefore(to)) {
                   // if scheduled start time >= $from && <= $to

@@ -12,6 +12,8 @@ import {MetricsPanelCtrl} from 'app/plugins/sdk'
 import './css/style.css!'
 import './css/bootstrap-slider.css!'
 import './css/instant-search.css!'
+import './css/timepicker.css!'
+import './css/datepicker.css!'
 
 let _ctrl
 
@@ -72,7 +74,7 @@ export class ChartCtrl extends MetricsPanelCtrl {
   }
 
   onDataReceived(dataList) {    
-    //console.log('o', utils.copyObject(dataList))
+    console.log('o', utils.copyObject(dataList))
     if (dataList.length === 0 || dataList === null || dataList === undefined) {
       // console.log('No data reveived')
       this.hasData = false
@@ -119,10 +121,10 @@ export class ChartCtrl extends MetricsPanelCtrl {
     rows = rows.filter(row => {
       const lowerCaseRow = row.map(elem => (typeof elem === 'string') ? elem.toLowerCase() : elem)
       if (lowerCaseRow.indexOf(cons.STATE_REPLACED) === -1 && lowerCaseRow.indexOf(cons.STATE_DELETED) === -1) {
-        if (!row[10]) { return row } // at the first time the start time will be null, let it in for now, and the time will be assigned, which will be examined later
-        const scheduledStartTimeTimeStamp = row[10] // the scheduled start time is the 10th elem
+        if (!row[8]) { return row } // at the first time the start time will be null, let it in for now, and the time will be assigned, which will be examined later
+        const scheduledStartTimeTimeStamp = row[8] // the scheduled start time is the 10th elem
         const scheduledStartTime = moment(scheduledStartTimeTimeStamp) // moment shcedule start time
-        const changeover = moment.duration(row[9], 'H:mm:ss') // moment changeover
+        const changeover = moment.duration(row[10], 'H:mm:ss') // moment changeover
         scheduledStartTime.subtract(changeover) // start time - changeover to have the initial time
         if (scheduledStartTime.isSameOrAfter(from) && scheduledStartTime.isSameOrBefore(to)) {
           // if scheduled start time >= $from && <= $to

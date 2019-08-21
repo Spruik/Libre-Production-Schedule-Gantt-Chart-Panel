@@ -13,9 +13,9 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
    */
   function writeLineForUpdate(status, data) {
     // For influxdb tag keys, must add a forward slash \ before each space
-    var product_desc = data.product_desc.split(' ').join('\\ ');
+    // let product_desc = data.product_desc.split(' ').join('\\ ')
 
-    var line = writeTags(data.order_id, data.product_id, product_desc);
+    var line = writeTags(data.order_id, data.product_id);
 
     if (data.compl_qty !== null && data.compl_qty !== undefined) {
       line += 'compl_qty=' + data.compl_qty + ',';
@@ -37,6 +37,7 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
     }
 
     line += 'order_state="' + status + '"' + ',';
+    line += 'product_desc="' + data.product_desc + '"' + ',';
     line += 'order_date="' + data.order_date + '"' + ',';
     line += 'planned_changeover_time="' + data.planned_changeover_time + '"' + ',';
     line += 'scheduled_end_datetime=' + data.endTime + ',';
@@ -57,10 +58,11 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
     var product_desc = data.product.split(' | ')[1];
 
     // For influxdb tag keys, must add a forward slash \ before each space
-    product_desc = product_desc.split(' ').join('\\ ');
+    // product_desc = product_desc.split(' ').join('\\ ')
 
-    var line = writeTags(data.orderId, product_id, product_desc);
+    var line = writeTags(data.orderId, product_id);
     line += 'order_state="' + initState + '"' + ',';
+    line += 'product_desc="' + product_desc + '"' + ',';
     line += 'order_date="' + data.date + '"' + ',';
     line += 'production_line="' + data.productionLine + '"' + ',';
     line += 'planned_changeover_time="' + data.changeover + '"' + ',';
@@ -106,9 +108,9 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
     var startTime = action === 'subtract' ? startTime = moment(data.startTime).subtract(roundedTimeDiff).valueOf() : startTime = moment(data.startTime).add(roundedTimeDiff).valueOf();
 
     // For influxdb tag keys, must add a forward slash \ before each space
-    var product_desc = data.product_desc.split(' ').join('\\ ');
+    // let product_desc = data.product_desc.split(' ').join('\\ ')
 
-    var line = writeTags(data.order_id, data.product_id, product_desc);
+    var line = writeTags(data.order_id, data.product_id);
 
     if (data.compl_qty !== null && data.compl_qty !== undefined) {
       line += 'compl_qty=' + data.compl_qty + ',';
@@ -130,6 +132,7 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
     }
 
     line += 'order_state="' + data.status + '"' + ',';
+    line += 'product_desc="' + data.product_desc + '"' + ',';
     line += 'order_date="' + data.order_date + '"' + ',';
     line += 'planned_changeover_time="' + data.planned_changeover_time + '"' + ',';
     line += 'production_line="' + data.production_line + '"' + ',';
@@ -149,9 +152,9 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
     var product_desc = data.product.split(' | ')[1];
 
     // For influxdb tag keys, must add a forward slash \ before each space
-    product_desc = product_desc.split(' ').join('\\ ');
+    // product_desc = product_desc.split(' ').join('\\ ')
 
-    var line = writeTags(data.orderId, product_id, product_desc);
+    var line = writeTags(data.orderId, product_id);
     if (data.compl_qty !== null && data.compl_qty !== undefined) {
       line += 'compl_qty=' + data.compl_qty + ',';
     }
@@ -168,13 +171,14 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
       line += 'actual_end_datetime=' + data.actual_end_datetime + ',';
     }
     line += 'order_state="' + currentStatus + '"' + ',';
+    line += 'product_desc="' + product_desc + '"' + ',';
     line += 'order_date="' + data.date + '"' + ',';
     line += 'production_line="' + data.productionLine + '"' + ',';
     line += 'planned_changeover_time="' + data.changeover + '"' + ',';
     line += 'order_qty=' + data.orderQty + ',';
     line += 'setpoint_rate=' + 0 + ',';
     line += 'planned_rate=' + data.plannedRate;
-    console.log('2');
+    // console.log('2');
     // console.log('writeLineForUpdateWithRemovingTime');
     // console.log(line);
     return line;
@@ -187,9 +191,9 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
     var product_desc = data.product.split(' | ')[1];
 
     // For influxdb tag keys, must add a forward slash \ before each space
-    product_desc = product_desc.split(' ').join('\\ ');
+    // product_desc = product_desc.split(' ').join('\\ ')
 
-    var line = writeTags(data.orderId, product_id, product_desc);
+    var line = writeTags(data.orderId, product_id);
     if (data.compl_qty !== null && data.compl_qty !== undefined) {
       line += 'compl_qty=' + data.compl_qty + ',';
     }
@@ -206,6 +210,7 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
       line += 'actual_end_datetime=' + data.actual_end_datetime + ',';
     }
     line += 'order_state="' + currentStatus + '"' + ',';
+    line += 'product_desc="' + product_desc + '"' + ',';
     line += 'order_date="' + data.date + '"' + ',';
     line += 'production_line="' + data.productionLine + '"' + ',';
     line += 'planned_changeover_time="' + data.changeover + '"' + ',';
@@ -214,7 +219,7 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
     line += 'order_qty=' + data.orderQty + ',';
     line += 'setpoint_rate=' + 0 + ',';
     line += 'planned_rate=' + data.plannedRate;
-    console.log('3');
+    // console.log('3');
     // console.log('writeLineForUpdateWithChangingTime');
     // console.log(line);
     return line;
@@ -224,9 +229,9 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
 
   function writeLineForUpdateDragging(data, startTime, endTime, targLine) {
     // For influxdb tag keys, must add a forward slash \ before each space
-    var product_desc = data.product_desc.split(' ').join('\\ ');
+    // let product_desc = data.product_desc.split(' ').join('\\ ')
 
-    var line = writeTags(data.order_id, data.product_id, product_desc);
+    var line = writeTags(data.order_id, data.product_id);
 
     if (data.compl_qty !== null && data.compl_qty !== undefined) {
       line += 'compl_qty=' + data.compl_qty + ',';
@@ -245,6 +250,7 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
     }
 
     line += 'order_state="' + data.status + '"' + ',';
+    line += 'product_desc="' + data.product_desc + '"' + ',';
     line += 'order_date="' + data.targeting_date + '"' + ',';
     line += 'planned_changeover_time="' + data.planned_changeover_time + '"' + ',';
     line += 'production_line="' + targLine + '"' + ',';
@@ -261,8 +267,8 @@ System.register(['./utils', './constans', 'moment'], function (_export, _context
 
   _export('writeLineForUpdateDragging', writeLineForUpdateDragging);
 
-  function writeTags(order_id, prod_id, prod_desc) {
-    return 'OrderPerformance,order_id=' + order_id + ',product_id=' + prod_id + ',product_desc=' + prod_desc + ' ';
+  function writeTags(order_id, prod_id) {
+    return 'OrderPerformance,order_id=' + order_id + ',product_id=' + prod_id + ' ';
   }
 
   /**

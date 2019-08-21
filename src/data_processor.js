@@ -115,8 +115,8 @@ function tailorData(data, rowCols) {
         }
 
         //update order's startTime and endTime
-        order[1] = startTime
-        order[2] = endtime    
+        order[findIndex("startTime", order_dimensions)] = startTime
+        order[findIndex("endTime", order_dimensions)] = endtime    
         
         let changeover_duration = order[findIndex('planned_changeover_time',order_dimensions)]
         if (changeover_duration !== '0:00:00'){ 
@@ -124,9 +124,9 @@ function tailorData(data, rowCols) {
           changeover_duration = moment.duration(changeover_duration)
           const changeover_startTime = moment(startTime).subtract(changeover_duration)
           let changeover = utils.copyObject(order)
-          changeover[2] = startTime // changeover's end time = main order's start time
-          changeover[1] = changeover_startTime.valueOf() // changeover's start time = it's end time - it's changeover time
-          changeover[8] = cons.STATE_CHANGEOVER // set statuts to be changeover
+          changeover[findIndex("endTime", order_dimensions)] = startTime // changeover's end time = main order's start time
+          changeover[findIndex("startTime", order_dimensions)] = changeover_startTime.valueOf() // changeover's start time = it's end time - it's changeover time
+          changeover[findIndex("status", order_dimensions)] = cons.STATE_CHANGEOVER // set statuts to be changeover
           order_data.push(changeover)
         }
       }
@@ -146,7 +146,6 @@ function tailorData(data, rowCols) {
         //get startTime, then calc the order's duration based on qty and rate, then calc the endTime
         let currentStartTime = _startTime.valueOf()
         let duration = order[findIndex('order_qty',order_dimensions)] / (order[findIndex('planned_rate',order_dimensions)] * 60)
-        console.log(duration)
         let _endTime = _startTime.add(duration, 'hours')
 
         //handle changeover
@@ -156,19 +155,21 @@ function tailorData(data, rowCols) {
           //if the order has changeover time
           changeover_duration = moment.duration(changeover_duration)
           let changeover = utils.copyObject(order)
-          changeover[1] = currentStartTime // changeover's start time = current start time
-          changeover[2] = moment(currentStartTime).add(changeover_duration).valueOf() // changeover's end time = main order's start time
-          changeover[8] = cons.STATE_CHANGEOVER // set statuts to be changeover
+          console.log('change_in', changeover)
+          console.log('change_d_in', order_dimensions)
+          changeover[findIndex("startTime", order_dimensions)] = currentStartTime // changeover's start time = current start time
+          changeover[findIndex("endTime", order_dimensions)] = moment(currentStartTime).add(changeover_duration).valueOf() // changeover's end time = main order's start time
+          changeover[findIndex("status", order_dimensions)] = cons.STATE_CHANGEOVER // set statuts to be changeover
 
           order_data.push(changeover)
 
           //update the order's startTime and endTime
-          order[1] = moment(currentStartTime).add(changeover_duration).valueOf()
-          order[2] = _endTime.add(changeover_duration).valueOf()
+          order[findIndex("startTime", order_dimensions)] = moment(currentStartTime).add(changeover_duration).valueOf()
+          order[findIndex("endTime", order_dimensions)] = _endTime.add(changeover_duration).valueOf()
         }else {
           //update the order's startTime and endTime
-          order[1] = currentStartTime
-          order[2] = _endTime.valueOf()
+          order[findIndex("startTime", order_dimensions)] = currentStartTime
+          order[findIndex("endTime", order_dimensions)] = _endTime.valueOf()
         }
   
         //update each order to the database
@@ -261,15 +262,16 @@ export function findIndex(key, array){
 
 function writeLine(data){  
   //For influxdb tag keys, must add a forward slash \ before each space   
-  let product_desc = data.product_desc.split(' ').join('\\ ')
+  // let product_desc = data.product_desc.split(' ').join('\\ ')
   
-  let line = 'OrderPerformance,order_id=' + data.order_id + ',product_id=' + data.product_id + ',product_desc=' + product_desc + ' '
+  let line = `OrderPerformance,order_id=${data.order_id},product_id=${data.product_id} `
 
   if (data.compl_qty !== null && data.compl_qty !== undefined) {
     line += 'compl_qty=' + data.compl_qty + ','
   }
 
   line += 'order_state="' + data.status + '"' + ','
+  line += 'product_desc="' + data.product_desc + '"' + ','
   line += 'order_date="' + data.order_date + '"' + ','
   line += 'production_line="' + data.production_line + '"' + ','
   line += 'planned_changeover_time="' + data.planned_changeover_time + '"' + ','
