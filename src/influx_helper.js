@@ -13,7 +13,6 @@ let hasTurnedAround = false
  */
 export function writeLineForUpdate (status, data) {
   // For influxdb tag keys, must add a forward slash \ before each space
-  // let product_desc = data.product_desc.split(' ').join('\\ ')
 
   let line = writeTags(data.order_id, data.product_id)
   
@@ -21,7 +20,7 @@ export function writeLineForUpdate (status, data) {
     line += 'compl_qty=' + data.compl_qty + ','
   }
   if (data.machine_state !== null && data.machine_state !== undefined) {
-    line += 'machine_state="' + data.machine_state + '"' + ','
+    line += 'machine_state="' + getRid(data.machine_state) + '"' + ','
   }
   if (data.scrap_qty !== null && data.scrap_qty !== undefined) {
     line += 'scrap_qty=' + data.scrap_qty + ','
@@ -36,13 +35,13 @@ export function writeLineForUpdate (status, data) {
     line += 'actual_end_datetime=' + data.actual_end_datetime + ','
   }
 
-  line += 'order_state="' + status + '"' + ','
-  line += 'product_desc="' + data.product_desc + '"' + ','
+  line += 'order_state="' + getRid(status) + '"' + ','
+  line += 'product_desc="' + getRid(data.product_desc) + '"' + ','
   line += 'order_date="' + data.order_date + '"' + ','
   line += 'planned_changeover_time="' + data.planned_changeover_time + '"' + ','
   line += 'scheduled_end_datetime=' + data.endTime + ','
   line += 'scheduled_start_datetime=' + data.startTime + ','
-  line += 'production_line="' + data.production_line + '"' + ','
+  line += 'production_line="' + getRid(data.production_line) + '"' + ','
   line += 'order_qty=' + data.order_qty + ','
   line += 'planned_rate=' + data.planned_rate
 
@@ -55,14 +54,11 @@ export function writeLineForCreate (data, initState) {
   const product_id = data.product.split(' | ')[0]
   let product_desc = data.product.split(' | ')[1]
 
-  // For influxdb tag keys, must add a forward slash \ before each space
-  // product_desc = product_desc.split(' ').join('\\ ')
-
   let line = writeTags(data.orderId, product_id)
-  line += 'order_state="' + initState + '"' + ','
-  line += 'product_desc="' + product_desc + '"' + ','
+  line += 'order_state="' + getRid(initState) + '"' + ','
+  line += 'product_desc="' + getRid(product_desc) + '"' + ','
   line += 'order_date="' + data.date + '"' + ','
-  line += 'production_line="' + data.productionLine + '"' + ','
+  line += 'production_line="' + getRid(data.productionLine) + '"' + ','
   line += 'planned_changeover_time="' + data.changeover + '"' + ','
   line += 'scheduled_end_datetime=' + data.endTime + ','
   line += 'scheduled_start_datetime=' + data.startTime + ','
@@ -70,7 +66,6 @@ export function writeLineForCreate (data, initState) {
   line += 'setpoint_rate=' + 0 + ','
   line += 'planned_rate=' + data.plannedRate
 
-  // console.log('writeLineForCreate');
   // console.log(line);
   return line
 }
@@ -106,16 +101,13 @@ export function writeLineForTimeUpdate (data, timeDiff, action) {
       ? (startTime = moment(data.startTime).subtract(roundedTimeDiff).valueOf())
       : (startTime = moment(data.startTime).add(roundedTimeDiff).valueOf())
 
-  // For influxdb tag keys, must add a forward slash \ before each space
-  // let product_desc = data.product_desc.split(' ').join('\\ ')
-
   let line = writeTags(data.order_id, data.product_id)
 
   if (data.compl_qty !== null && data.compl_qty !== undefined) {
     line += 'compl_qty=' + data.compl_qty + ','
   }
   if (data.machine_state !== null && data.machine_state !== undefined) {
-    line += 'machine_state="' + data.machine_state + '"' + ','
+    line += 'machine_state="' + getRid(data.machine_state) + '"' + ','
   }
   if (data.scrap_qty !== null && data.scrap_qty !== undefined) {
     line += 'scrap_qty=' + data.scrap_qty + ','
@@ -130,11 +122,11 @@ export function writeLineForTimeUpdate (data, timeDiff, action) {
     line += 'actual_end_datetime=' + data.actual_end_datetime + ','
   }
 
-  line += 'order_state="' + data.status + '"' + ','
-  line += 'product_desc="' + data.product_desc + '"' + ','
+  line += 'order_state="' + getRid(data.status) + '"' + ','
+  line += 'product_desc="' + getRid(data.product_desc) + '"' + ','
   line += 'order_date="' + data.order_date + '"' + ','
   line += 'planned_changeover_time="' + data.planned_changeover_time + '"' + ','
-  line += 'production_line="' + data.production_line + '"' + ','
+  line += 'production_line="' + getRid(data.production_line) + '"' + ','
   line += 'order_qty=' + data.order_qty + ','
   line += 'scheduled_end_datetime=' + endTime + ','
   line += 'scheduled_start_datetime=' + startTime + ','
@@ -156,7 +148,7 @@ export function writeLineForUpdateWithRemovingTime (data, currentStatus) {
     line += 'compl_qty=' + data.compl_qty + ','
   }
   if (data.machine_state !== null && data.machine_state !== undefined) {
-    line += 'machine_state="' + data.machine_state + '"' + ','
+    line += 'machine_state="' + getRid(data.machine_state) + '"' + ','
   }
   if (data.scrap_qty !== null && data.scrap_qty !== undefined) {
     line += 'scrap_qty=' + data.scrap_qty + ','
@@ -167,10 +159,10 @@ export function writeLineForUpdateWithRemovingTime (data, currentStatus) {
   if (data.actual_end_datetime !== null && data.actual_end_datetime !== undefined) {
     line += 'actual_end_datetime=' + data.actual_end_datetime + ','
   }
-  line += 'order_state="' + currentStatus + '"' + ','
-  line += 'product_desc="' + product_desc + '"' + ','
+  line += 'order_state="' + getRid(currentStatus) + '"' + ','
+  line += 'product_desc="' + getRid(product_desc) + '"' + ','
   line += 'order_date="' + data.date + '"' + ','
-  line += 'production_line="' + data.productionLine + '"' + ','
+  line += 'production_line="' + getRid(data.productionLine) + '"' + ','
   line += 'planned_changeover_time="' + data.changeover + '"' + ','
   line += 'order_qty=' + data.orderQty + ','
   line += 'setpoint_rate=' + 0 + ','
@@ -193,7 +185,7 @@ export function writeLineForUpdateWithChangingTime (data, currentStatus, startTi
     line += 'compl_qty=' + data.compl_qty + ','
   }
   if (data.machine_state !== null && data.machine_state !== undefined) {
-    line += 'machine_state="' + data.machine_state + '"' + ','
+    line += 'machine_state="' + getRid(data.machine_state) + '"' + ','
   }
   if (data.scrap_qty !== null && data.scrap_qty !== undefined) {
     line += 'scrap_qty=' + data.scrap_qty + ','
@@ -204,10 +196,10 @@ export function writeLineForUpdateWithChangingTime (data, currentStatus, startTi
   if (data.actual_end_datetime !== null && data.actual_end_datetime !== undefined) {
     line += 'actual_end_datetime=' + data.actual_end_datetime + ','
   }
-  line += 'order_state="' + currentStatus + '"' + ','
-  line += 'product_desc="' + product_desc + '"' + ','
+  line += 'order_state="' + getRid(currentStatus) + '"' + ','
+  line += 'product_desc="' + getRid(product_desc) + '"' + ','
   line += 'order_date="' + data.date + '"' + ','
-  line += 'production_line="' + data.productionLine + '"' + ','
+  line += 'production_line="' + getRid(data.productionLine) + '"' + ','
   line += 'planned_changeover_time="' + data.changeover + '"' + ','
   line += 'scheduled_end_datetime=' + endTime + ','
   line += 'scheduled_start_datetime=' + startTime + ','
@@ -221,8 +213,6 @@ export function writeLineForUpdateWithChangingTime (data, currentStatus, startTi
 }
 
 export function writeLineForUpdateDragging(data, startTime, endTime, targLine) {
-  // For influxdb tag keys, must add a forward slash \ before each space
-  // let product_desc = data.product_desc.split(' ').join('\\ ')
 
   let line = writeTags(data.order_id, data.product_id)
 
@@ -230,7 +220,7 @@ export function writeLineForUpdateDragging(data, startTime, endTime, targLine) {
     line += 'compl_qty=' + data.compl_qty + ','
   }
   if (data.machine_state !== null && data.machine_state !== undefined) {
-    line += 'machine_state="' + data.machine_state + '"' + ','
+    line += 'machine_state="' + getRid(data.machine_state) + '"' + ','
   }
   if (data.scrap_qty !== null && data.scrap_qty !== undefined) {
     line += 'scrap_qty=' + data.scrap_qty + ','
@@ -242,17 +232,16 @@ export function writeLineForUpdateDragging(data, startTime, endTime, targLine) {
     line += 'actual_end_datetime=' + data.actual_end_datetime + ','
   }
 
-  line += 'order_state="' + data.status + '"' + ','
-  line += 'product_desc="' + data.product_desc + '"' + ','
+  line += 'order_state="' + getRid(data.status) + '"' + ','
+  line += 'product_desc="' + getRid(data.product_desc) + '"' + ','
   line += 'order_date="' + data.targeting_date + '"' + ','
   line += 'planned_changeover_time="' + data.planned_changeover_time + '"' + ','
-  line += 'production_line="' + targLine + '"' + ','
+  line += 'production_line="' + getRid(targLine) + '"' + ','
   line += 'order_qty=' + data.order_qty + ','
   line += 'scheduled_end_datetime=' + endTime + ','
   line += 'scheduled_start_datetime=' + startTime + ','
   line += 'setpoint_rate=' + 0 + ','
   line += 'planned_rate=' + data.planned_rate
-  console.log('4');
   // console.log('writeLineForUpdateDragging');
   // console.log(line);
   return line
@@ -290,4 +279,6 @@ function getTimeText(time){
   return hour + ':' + mins + ':' + seconds
 }
 
-
+function getRid(x) {
+  return x.split('"').join('\\"')
+}

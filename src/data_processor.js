@@ -155,8 +155,8 @@ function tailorData(data, rowCols) {
           //if the order has changeover time
           changeover_duration = moment.duration(changeover_duration)
           let changeover = utils.copyObject(order)
-          console.log('change_in', changeover)
-          console.log('change_d_in', order_dimensions)
+          // console.log('change_in', changeover)
+          // console.log('change_d_in', order_dimensions)
           changeover[findIndex("startTime", order_dimensions)] = currentStartTime // changeover's start time = current start time
           changeover[findIndex("endTime", order_dimensions)] = moment(currentStartTime).add(changeover_duration).valueOf() // changeover's end time = main order's start time
           changeover[findIndex("status", order_dimensions)] = cons.STATE_CHANGEOVER // set statuts to be changeover
@@ -269,11 +269,14 @@ function writeLine(data){
   if (data.compl_qty !== null && data.compl_qty !== undefined) {
     line += 'compl_qty=' + data.compl_qty + ','
   }
+  if (data.machine_state !== null && data.machine_state !== undefined) {
+    line += 'machine_state="' + getRid(data.machine_state) + '"' + ','
+  }
 
-  line += 'order_state="' + data.status + '"' + ','
-  line += 'product_desc="' + data.product_desc + '"' + ','
+  line += 'order_state="' + getRid(data.status) + '"' + ','
+  line += 'product_desc="' + getRid(data.product_desc) + '"' + ','
   line += 'order_date="' + data.order_date + '"' + ','
-  line += 'production_line="' + data.production_line + '"' + ','
+  line += 'production_line="' + getRid(data.production_line) + '"' + ','
   line += 'planned_changeover_time="' + data.planned_changeover_time + '"' + ','
   line += 'order_qty=' + data.order_qty + ','
   line += 'scheduled_end_datetime=' + data.endTime + ','
@@ -282,6 +285,10 @@ function writeLine(data){
   line += 'planned_rate=' + data.planned_rate
 
   return line
+}
+
+function getRid(x) {
+  return x.split('"').join('\\"')
 }
 
 export function getColor(status){

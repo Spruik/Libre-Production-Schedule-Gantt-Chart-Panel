@@ -171,7 +171,7 @@ System.register(['angular', 'moment', 'lodash', 'jquery', './data_processor', '.
         }, {
           key: 'onDataReceived',
           value: function onDataReceived(dataList) {
-            console.log('o', utils.copyObject(dataList));
+            // console.log('o', utils.copyObject(dataList))
             if (dataList.length === 0 || dataList === null || dataList === undefined) {
               // console.log('No data reveived')
               this.hasData = false;
