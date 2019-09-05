@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 System.register([], function (_export, _context) {
 	"use strict";
@@ -32,7 +32,7 @@ System.register([], function (_export, _context) {
 				};
 			}();
 
-			_export("DataList", DataList = function () {
+			_export('DataList', DataList = function () {
 				function DataList(containerId, inputId, listId, options) {
 					_classCallCheck(this, DataList);
 
@@ -43,27 +43,27 @@ System.register([], function (_export, _context) {
 				}
 
 				_createClass(DataList, [{
-					key: "create",
+					key: 'create',
 					value: function create() {
-						var filter = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+						var filter = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
 						var list = document.getElementById(this.listId);
 						var filterOptions = this.options.filter(function (d) {
-							return filter === "" || d.text.toLowerCase().replace(/ /g, '').includes(filter.toLowerCase().replace(/ /g, ''));
+							return filter === '' || d.text.toLowerCase().replace(/ /g, '').includes(filter.toLowerCase().replace(/ /g, ''));
 						});
 
 						if (filterOptions.length === 0) {
-							list.classList.remove("active");
+							list.classList.remove('active');
 						} else {
-							list.classList.add("active");
+							list.classList.add('active');
 						}
 
 						list.innerHTML = filterOptions.map(function (o) {
-							return "<li id=" + o.value + ">" + o.text + "</li>";
-						}).join("");
+							return '<li id=' + o.value + '>' + o.text + '</li>';
+						}).join('');
 					}
 				}, {
-					key: "addListeners",
+					key: 'addListeners',
 					value: function addListeners(datalist) {
 						var _this = this;
 
@@ -71,31 +71,31 @@ System.register([], function (_export, _context) {
 						var input = document.getElementById(this.inputId);
 						var list = document.getElementById(this.listId);
 
-						container.addEventListener("click", function (e) {
+						container.addEventListener('click', function (e) {
 							if (e.target.id === _this.inputId) {
-								container.classList.toggle("active");
-							} else if (e.target.id === "datalist-icon") {
-								container.classList.toggle("active");
+								container.classList.toggle('active');
+							} else if (e.target.id === 'datalist-icon') {
+								container.classList.toggle('active');
 								input.focus();
 							}
 						});
 
-						input.addEventListener("input", function (e) {
-							if (!container.classList.contains("active")) {
-								container.classList.add("active");
+						input.addEventListener('input', function (e) {
+							if (!container.classList.contains('active')) {
+								container.classList.add('active');
 							}
 							datalist.create(input.value);
 						});
 
-						list.addEventListener("click", function (e) {
-							if (e.target.nodeName.toLocaleLowerCase() === "li") {
+						list.addEventListener('click', function (e) {
+							if (e.target.nodeName.toLocaleLowerCase() === 'li') {
 								input.value = e.target.innerText;
-								container.classList.remove("active");
+								container.classList.remove('active');
 							}
 						});
 					}
 				}, {
-					key: "removeListeners",
+					key: 'removeListeners',
 					value: function removeListeners() {
 						var _this2 = this;
 
@@ -103,26 +103,26 @@ System.register([], function (_export, _context) {
 						var input = document.getElementById(this.inputId);
 						var list = document.getElementById(this.listId);
 
-						container.removeEventListener("click", function (e) {
+						container.removeEventListener('click', function (e) {
 							if (e.target.id === _this2.inputId) {
-								container.classList.toggle("active");
-							} else if (e.target.id === "datalist-icon") {
-								container.classList.toggle("active");
+								container.classList.toggle('active');
+							} else if (e.target.id === 'datalist-icon') {
+								container.classList.toggle('active');
 								input.focus();
 							}
 						});
 
-						input.removeEventListener("input", function (e) {
-							if (!container.classList.contains("active")) {
-								container.classList.add("active");
+						input.removeEventListener('input', function (e) {
+							if (!container.classList.contains('active')) {
+								container.classList.add('active');
 							}
 							datalist.create(input.value);
 						});
 
-						list.removeEventListener("click", function (e) {
-							if (e.target.nodeName.toLocaleLowerCase() === "li") {
+						list.removeEventListener('click', function (e) {
+							if (e.target.nodeName.toLocaleLowerCase() === 'li') {
 								input.value = e.target.innerText;
-								container.classList.remove("active");
+								container.classList.remove('active');
 							}
 						});
 					}
@@ -131,7 +131,7 @@ System.register([], function (_export, _context) {
 				return DataList;
 			}());
 
-			_export("DataList", DataList);
+			_export('DataList', DataList);
 		}
 	};
 });
