@@ -273,7 +273,6 @@ System.register(['./utils', './influx_helper', './data_processor', './instant_se
     var oldTotal = moment.duration(_targetOrder.order_qty / (_targetOrder.planned_rate * 60), 'hours').add(moment.duration(_targetOrder.planned_changeover_time));
     var newTotal = duration.add(moment.duration(inputValues.changeover));
     var difference = oldTotal.subtract(newTotal);
-    console.log('dif in gantt-', difference);
 
     var line = influx.writeLineForUpdateWithChangingTime(inputValues, _targetOrder.status, startTime.valueOf(), endTime.valueOf());
     utils.post(influx.writeUrl, line).then(function (res) {

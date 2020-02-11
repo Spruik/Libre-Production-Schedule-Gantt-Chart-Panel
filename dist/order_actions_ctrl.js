@@ -77,7 +77,6 @@ System.register(['./utils', './influx_helper', './insertion_actions_ctrl', './ed
   _export('getOrderStates', getOrderStates);
 
   function updateOrderStatus(status) {
-    console.log('status', status);
     var line = influx.writeLineForUpdate(status, _order);
     if (status.toLowerCase() === 'deleted') {
       deleteCurrentAndUpdateAffectOrders(line);
@@ -94,7 +93,6 @@ System.register(['./utils', './influx_helper', './insertion_actions_ctrl', './ed
   }
 
   function deleteCurrentAndUpdateAffectOrders(line) {
-    console.log('gantt deleteAndUpdateBehind');
     //create promises array and put the 'delete current order request' into it first
     var promises = [utils.post(influx.writeUrl, line)];
 
@@ -111,8 +109,6 @@ System.register(['./utils', './influx_helper', './insertion_actions_ctrl', './ed
     var deletingOrderDurationHour = moment.duration(_order.order_qty / (_order.planned_rate * 60), 'hours');
     var deletingOrderChangeover = moment.duration(_order.planned_changeover_time, 'H:mm:ss');
     var deletingOrderTotalDur = deletingOrderDurationHour.add(deletingOrderChangeover);
-
-    console.log('gantt total delete dur', deletingOrderTotalDur);
 
     //loop affected orders, order's starttime and endtime should both subtract the total duration worked out
     affectedOrders.forEach(function (order) {

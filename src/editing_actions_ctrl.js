@@ -351,7 +351,6 @@ function updateWithChanging(inputValues) {
     .add(moment.duration(_targetOrder.planned_changeover_time));
   const newTotal = duration.add(moment.duration(inputValues.changeover));
   const difference = oldTotal.subtract(newTotal);
-  console.log('dif in gantt-', difference);
 
   const line = influx.writeLineForUpdateWithChangingTime(
     inputValues,
