@@ -134,9 +134,9 @@ export function queryProductionLineDetails(callback) {
 			_prodLineDetails = res;
 			callback();
 		})
-		// .catch((e) => {
-		// 	alert('error', 'Error', 'An error has occurred due to ' + e + ', please refresh the page and try again');
-		// });
+		.catch((e) => {
+			alert('error', 'Error', 'An error has occurred due to ' + e + ', please refresh the page and try again');
+		});
 }
 
 export function highlightColor(hexColor) {
