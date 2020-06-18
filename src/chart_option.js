@@ -35,10 +35,10 @@ let _panelCtrl
 let _bottomSliderDataZoomStart
 let _bottomSliderDataZoomEnd
 
-export function getOption (data, ) {
+export function getOption (data, timeSrv) {
   
   _rawData = data   
-  
+
   let option = {
     tooltip: {
     },
@@ -120,6 +120,8 @@ export function getOption (data, ) {
     xAxis: {
         type: 'time',
         position: 'top',
+        min: timeSrv.timeRange().from.unix() * 1000,
+        max: timeSrv.timeRange().to.unix() * 1000,
         splitLine: {
             lineStyle: {
                 color: ['#E9EDFF']
@@ -192,11 +194,12 @@ export function getOption (data, ) {
         data: _rawData.order.data
       },
       {
+        id: 'linedata',
         type: 'custom',
         renderItem: renderAxisLabelItem,
         dimensions: _rawData.line.dimensions,
         encode: {
-            x: -1, // Then this series will not controlled by x.
+            //x: -1, // Then this series will not controlled by x.
             y: 0
         },
         data: echarts.util.map(_rawData.line.data, function (item, index) {

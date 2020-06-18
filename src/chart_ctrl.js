@@ -153,7 +153,7 @@ export class ChartCtrl extends MetricsPanelCtrl {
 			if (!myChart || !data) {
 				return;
 			}
-			const option = chart.getOption(data);
+			const option = chart.getOption(data, _ctrl.timeSrv);
 			// myChart.clear();
 			myChart.setOption(option);
 			setTimeout(() => {

@@ -1,0 +1,27 @@
+version: '3.0'
+
+services:
+  grafana:
+    image: grafana/grafana:6.7.4
+    ports: 
+      - 3000:3000
+    volumes:
+      - ./dist:/var/lib/grafana/plugins/smart-factory-production-schedule-gantt-chart-panel:ro
+      - ./dev/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml:ro
+      - ./dev/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml:ro
+      - ./dev/test.json:/dashboards/test.json:ro
+  postgres:
+    image: postgres:9.6
+    environment:
+      - POSTGRES_PASSWORD=mysecretpassword
+    volumes:
+      - ./dev/01_data_bootstrap.sql:/docker-entrypoint-initdb.d/01_data_bootstrap.sql:ro
+  postREST:
+    image: postgrest/postgrest
+    ports: 
+      - 5436:3000
+    environment:
+      - PGRST_DB_URI=postgres://postgres:mysecretpassword@postgres/postgres
+      - PGRST_DB_ANON_ROLE=postgres
+    depends_on: 
+      - postgres
