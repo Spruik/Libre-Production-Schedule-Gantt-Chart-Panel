@@ -10,7 +10,7 @@ module.exports = function (grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    clean: ["dist"],
+    //clean: ["dist"],
 
     jshint: {
       options: {
@@ -38,7 +38,7 @@ module.exports = function (grunt) {
       echarts_libs: {
         cwd: 'node_modules/echarts/dist',
         expand: true,
-        src: ['echarts.min.js'],
+        src: ['echarts.js', 'echarts.js.map'],
         dest: 'dist/libs/',
       },
       image_to_dist: {
@@ -82,7 +82,7 @@ module.exports = function (grunt) {
   });
   grunt.registerTask('default', [
     // 'jshint',
-    'clean',
+    //'clean',
     "copy:src_to_dist",
     'copy:libs',
     'copy:echarts_libs',

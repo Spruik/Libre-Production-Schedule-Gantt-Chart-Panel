@@ -6,7 +6,7 @@ import * as dp from './data_processor';
 import * as chart from './chart_option';
 import * as utils from './utils';
 import * as cons from './constans';
-import echarts from './libs/echarts.min';
+import echarts from './libs/echarts';
 import { MetricsPanelCtrl } from 'app/plugins/sdk';
 
 import './css/style.css!';
@@ -107,6 +107,7 @@ export class ChartCtrl extends MetricsPanelCtrl {
 			if (data.length === 0) {
 				return;
 			}
+			console.log(data);
 			self.render(data);
 		}
 	}
@@ -162,7 +163,7 @@ export class ChartCtrl extends MetricsPanelCtrl {
 				window.onresize = () => {
 					myChart.resize();
 				};
-			}, 500);
+			}, 1000);
 
 			chart.interationSetup(myChart, ctrl);
 		}

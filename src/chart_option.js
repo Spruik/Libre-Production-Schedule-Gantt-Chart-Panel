@@ -4,7 +4,7 @@ import * as order_actions from './order_actions_ctrl'
 import * as dropCtrl from './drop_order_ctrl'
 import * as cons from './constans'
 
-import echarts from './libs/echarts.min'
+import echarts from './libs/echarts'
 import moment from 'moment'
 
 let HEIGHT_RATIO = 0.6;
@@ -152,7 +152,7 @@ export function getOption (data, ) {
         id: 'flightData',
         type: 'custom',
         renderItem: renderGanttItem,
-        dimensions: _rawData.order.dimensions,
+        //dimensions: _rawData.order.dimensions,
         tooltip: {
             formatter: params => {                                
                 const startTime = moment(params.data[1]).format('YYYY-MM-DD H:mm:ss')
@@ -192,9 +192,11 @@ export function getOption (data, ) {
         data: _rawData.order.data
       },
       {
+        id: 'linedata',
         type: 'custom',
         renderItem: renderAxisLabelItem,
-        dimensions: _rawData.line.dimensions,
+        dimensions: null,
+        //dimensions: _rawData.line.dimensions,
         encode: {
             x: -1, // Then this series will not controlled by x.
             y: 0
@@ -206,6 +208,14 @@ export function getOption (data, ) {
     ]
   }
 
+  for (var i = 0; i < option.series.length; i++){
+    console.log(`Serie ${i}`);
+    if (option.series[i].dimensions)
+      console.log(option.series[i].dimensions);
+    if (option.series[i].data)
+      console.log(option.series[i].data);
+    console.log();
+  }
   return option
 }
 
