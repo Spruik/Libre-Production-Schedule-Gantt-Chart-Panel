@@ -1,1 +1,1 @@
-{"version":3,"sources":["../src/module.js"],"names":["ChartCtrl"],"mappings":";;;;;;;;AAASA,e,eAAAA,S;;;2BAEAA,S;;2BAAWA,S","file":"module.js","sourcesContent":["import { ChartCtrl } from './chart_ctrl';\n\nexport { ChartCtrl, ChartCtrl as PanelCtrl };\n"]}
+{"version":3,"sources":["../src/module.js"],"names":["ChartCtrl"],"mappings":";;;;;;;;AAASA,e,eAAAA,S;;;2BAEAA,S;;2BAAWA,S","file":"module.js","sourcesContent":["import { ChartCtrl } from './chart_ctrl';\r\n\r\nexport { ChartCtrl, ChartCtrl as PanelCtrl };\r\n"]}
