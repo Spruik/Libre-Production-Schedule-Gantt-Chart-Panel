@@ -6,7 +6,7 @@ import * as dp from './data_processor';
 import * as chart from './chart_option';
 import * as utils from './utils';
 import * as cons from './constans';
-import echarts from './libs/echart.min';
+import echarts from './libs/echarts.min';
 import { MetricsPanelCtrl } from 'app/plugins/sdk';
 
 import './css/style.css!';
