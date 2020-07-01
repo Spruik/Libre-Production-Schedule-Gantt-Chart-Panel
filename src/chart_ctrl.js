@@ -188,4 +188,4 @@ export function refreshDashb() {
 	_ctrl.timeSrv.refreshDashboard();
 }
 
-ChartCtrl.templateUrl = 'partials/module.html';
+ChartCtrl.templateUrl = 'public/plugins/libre-production-schedule-gantt-chart-panel/partials/module.html';

@@ -1,4 +1,4 @@
-# smart-factory-production-schedule-gantt-chart-panel
+# libre-production-schedule-gantt-chart-panel
 A Production Schedule Gantt Chart Panel with drag-and-drop enabled for scheduling and rescheduling orders.
 
 ## Installation

@@ -1,14 +1,14 @@
 {
-  "name": "smart-factory-production-schedule-gantt-chart-panel",
+  "name": "libre-production-schedule-gantt-chart-panel",
   "version": "1.0.0",
-  "description": "Production Schedule Gantt Chart",
+  "description": "Libre Gantt Chart Panel to visually schedule Production Orders on Lines",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Spruik/smart-factory-production-schedule-gantt-chart-panel"
+    "url": "https://github.com/Spruik/Libre-Production-Schedule-Gantt-Chart-Panel"
   },
   "author": "Spruik Technologies",
   "bugs": {
-    "url": "https://github.com/Spruik/smart-factory-production-schedule-gantt-chart-panel/issues"
+    "url": "https://github.com/Spruik/Libre-Production-Schedule-Gantt-Chart-Panel/issues"
   },
   "main": "src/module.js",
   "scripts": {
