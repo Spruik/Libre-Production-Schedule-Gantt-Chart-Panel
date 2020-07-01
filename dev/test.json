@@ -139,7 +139,7 @@
       "timeFrom": "3y",
       "timeShift": null,
       "title": "Data as Gantt Chart",
-      "type": "smart-factory-production-schedule-gantt-chart-panel"
+      "type": "libre-production-schedule-gantt-chart-panel"
     }
   ],
   "schemaVersion": 22,

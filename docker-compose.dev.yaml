@@ -6,7 +6,7 @@ services:
     ports: 
       - 3000:3000
     volumes:
-      - ./dist:/var/lib/grafana/plugins/smart-factory-production-schedule-gantt-chart-panel:ro
+      - ./dist:/var/lib/grafana/plugins/libre-production-schedule-gantt-chart-panel:ro
       - ./dev/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml:ro
       - ./dev/dashboard.yaml:/etc/grafana/provisioning/dashboards/dashboard.yaml:ro
       - ./dev/test.json:/dashboards/test.json:ro

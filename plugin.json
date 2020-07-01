@@ -1,25 +1,32 @@
 {
-  "type": "panel",
+  "id": "libre-production-schedule-gantt-chart-panel",
   "name": "Production Schedule Gantt Chart",
-  "id": "smart-factory-production-schedule-gantt-chart-panel",
-
+  "type": "panel",
   "info": {
-    "description": "Production Schedule Gantt Chart",
-    "keywords": ["gantt", "panel"],
+    "author": {
+      "name": "Spruik Technologies",
+      "email": "info@spruiktec.com",
+      "url": "https://spruiktec.com"
+    },
+    "description": "Libre Gantt Chart Panel to visually schedule Production Orders on Lines",
+    "keywords": ["gantt", "panel", "libre"],
     "links": [
-      {"name": "Project site", "url": "https://github.com/Billiballa/grafana-table-panel"}
+      {"name": "Project site", "url": "https://github.com/Spruik/Libre-Production-Schedule-Gantt-Chart-Panel"},
+      {"name": "Issues", "url": "https://github.com/Spruik/Libre-Production-Schedule-Gantt-Chart-Panel/issues"}
+    ],
+    "logos": {
+      "small": "img/icn-table-panel.svg",
+      "large": "img/icn-table-panel.svg"
+    },
+    "screenshots": [
+      {"name": "Panel", "url":"public/plugins/libre-production-schedule-gantt-chart-panel/docs/libre-production-schedule-gantt-chart-panel.png"},
+      {"name": "Metric", "url":"public/plugins/libre-production-schedule-gantt-chart-panel/docs/libre-production-schedule-gantt-chart-panel-metrics.png"}
     ],
     "version": "1.0.0",
-    "updated": "2017-06-23"
+    "updated": "2020-06-30"
   },
-  
-  "logos": {
-    "small": "img/icn-table-panel.svg",
-    "large": "img/icn-table-panel.svg"
-  },
-
   "dependencies": {
-    "grafanaVersion": "4.x.x",
+    "grafanaVersion": "6.x.x",
     "plugins": [ ]
   }
 }
