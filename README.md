@@ -4,7 +4,7 @@
 
 This panel enables users to quickly visualize and navigate production line schedules in time with changeover and order duration styled differently. Users can enable edit mode and reschedule orders by click and dragging orders in time and even reschedule across production lines. Order start times are validated against the start time of the production line when dragging orders. This panel is part of [Libre](https://github.com/Spruik/Libre) suite of Grafana plugins and dashbaords. This plugin interfaces to a no security json rest api for equipment running on the same grafana server. This panel is targeted at Grafana v6.x.x only.
 
-![Panel](./docs/libre-production-schedule-gantt-chart-panel.gif)
+![Panel](./docs/libre-production-schedule-gantt-chart-panel.png)
 
 ## Installation
 
