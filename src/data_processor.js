@@ -3,8 +3,8 @@ import * as cons from './constans'
 import moment from 'moment'
 import * as chartCtrl from './chart_ctrl'
 
-let _order_data
-let _order_dimensions
+let _orderData
+let _orderDimensions
 
 /**
  * Expecting columns names, and rows values
@@ -48,9 +48,9 @@ function tailorData (data, rowCols) {
   }
 
   // make order_data and its dimensions
-  const order_data = takeOfKeys(data)
+  const orderData = takeOfKeys(data)
 
-  let order_dimensions = rowCols.reduce((arr, col) => {
+  let orderDimensions = rowCols.reduce((arr, col) => {
     arr.push(col.text.toLowerCase())
     return arr
   }, [])
@@ -63,31 +63,31 @@ function tailorData (data, rowCols) {
   lines = utils.findDistinct(lines)
 
   // make line_data to match the dimension, which is expected by the chart option data
-  const line_data = []
+  const lineData = []
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]
     const l = line.split(' | ')
     const item = [l[0] + ' | ' + l[1], l[2], i, line]
-    line_data.push(item)
+    lineData.push(item)
   }
 
-  const line_dimensions = ['SiteArea', 'Line', 'Index', 'ProductionLine']
+  const lineDimensions = ['SiteArea', 'Line', 'Index', 'ProductionLine']
 
   // add elems to the dimension, which are expected by the option
-  const positioning_dimensions = ['index', 'startTime', 'endTime']
-  order_dimensions = positioning_dimensions.concat(order_dimensions)
+  const positioningDimensions = ['index', 'startTime', 'endTime']
+  orderDimensions = positioningDimensions.concat(orderDimensions)
 
   // add elems to the order_data to match the dimension
-  for (let i = 0; i < order_data.length; i++) {
+  for (let i = 0; i < orderData.length; i++) {
     const d = data[i]
-    const index = matchIndex(d.production_line, line_data)
+    const index = matchIndex(d.production_line, lineData)
     data[i].index = index
-    const positioning_data = [index, 0, 0]
-    order_data[i] = positioning_data.concat(order_data[i])
+    const positioningData = [index, 0, 0]
+    orderData[i] = positioningData.concat(orderData[i])
   }
 
   // categorise the order_data, group by line, and in each lineGroup, group by date
-  const categorisedOrders = categoriseByLineAndDate(order_data, 'array', data)
+  const categorisedOrders = categoriseByLineAndDate(orderData, 'array', data)
   const promises = []
   for (let i = 0; i < categorisedOrders.length; i++) {
     const lineGroup = categorisedOrders[i]
@@ -98,21 +98,18 @@ function tailorData (data, rowCols) {
       // filter out two groups, one is with startTime initalised, one is not.
       const STkey = 'scheduled_start_datetime'
       const dateGroupWithTime = dateGroup.filter(
-        (order) =>
-          order[findIndex(STkey, order_dimensions)] !== null &&
-					order[findIndex(STkey, order_dimensions)] !== undefined
+        (order) => order[findIndex(STkey, orderDimensions)] !== null && order[findIndex(STkey, orderDimensions)] !== undefined
       )
       const dateGroupWithoutTime = dateGroup.filter(
         (order) =>
-          order[findIndex(STkey, order_dimensions)] === null ||
-					order[findIndex(STkey, order_dimensions)] === undefined
+          order[findIndex(STkey, orderDimensions)] === null || order[findIndex(STkey, orderDimensions)] === undefined
       )
 
       // loop thro the date group containing orders that are with time
       for (let wt = 0; wt < dateGroupWithTime.length; wt++) {
         const order = dateGroupWithTime[wt]
-        const startTime = order[findIndex(STkey, order_dimensions)]
-        const endtime = order[findIndex('scheduled_end_datetime', order_dimensions)]
+        const startTime = order[findIndex(STkey, orderDimensions)]
+        const endtime = order[findIndex('scheduled_end_datetime', orderDimensions)]
 
         if (_startTime === 0) {
           _startTime = moment(endtime)
@@ -125,19 +122,19 @@ function tailorData (data, rowCols) {
         }
 
         // update order's startTime and endTime
-        order[findIndex('startTime', order_dimensions)] = startTime
-        order[findIndex('endTime', order_dimensions)] = endtime
+        order[findIndex('startTime', orderDimensions)] = startTime
+        order[findIndex('endTime', orderDimensions)] = endtime
 
-        let changeoverDuration = order[findIndex('planned_changeover_time', order_dimensions)]
+        let changeoverDuration = order[findIndex('planned_changeover_time', orderDimensions)]
         if (changeoverDuration !== '0:00:00') {
           // if the order has changeover time
           changeoverDuration = moment.duration(changeoverDuration)
           const changeoverStartTime = moment(startTime).subtract(changeoverDuration)
           const changeover = utils.copyObject(order)
-          changeover[findIndex('endTime', order_dimensions)] = startTime // changeover's end time = main order's start time
-          changeover[findIndex('startTime', order_dimensions)] = changeoverStartTime.valueOf() // changeover's start time = it's end time - it's changeover time
-          changeover[findIndex('status', order_dimensions)] = cons.STATE_CHANGEOVER // set statuts to be changeover
-          order_data.push(changeover)
+          changeover[findIndex('endTime', orderDimensions)] = startTime // changeover's end time = main order's start time
+          changeover[findIndex('startTime', orderDimensions)] = changeoverStartTime.valueOf() // changeover's start time = it's end time - it's changeover time
+          changeover[findIndex('status', orderDimensions)] = cons.STATE_CHANGEOVER // set statuts to be changeover
+          orderData.push(changeover)
         }
       }
 
@@ -145,48 +142,46 @@ function tailorData (data, rowCols) {
       for (let o = 0; o < dateGroupWithoutTime.length; o++) {
         const order = dateGroupWithoutTime[o]
         const lineDefaultStartTime = utils.getLineStartTime(
-          order[findIndex('production_line', order_dimensions)]
+          order[findIndex('production_line', orderDimensions)]
         )
         // if there is no startTime, init it with the order_date and lineDefaultStartTime
         if (_startTime === 0) {
-          _startTime = order[findIndex('order_date', order_dimensions)] + ' ' + lineDefaultStartTime
+          _startTime = order[findIndex('order_date', orderDimensions)] + ' ' + lineDefaultStartTime
           _startTime = moment(_startTime, 'YYYY-MM-DD H:mm:ss')
         }
 
         // get startTime, then calc the order's duration based on qty and rate, then calc the endTime
         const currentStartTime = _startTime.valueOf()
-        const duration =
-					order[findIndex('order_qty', order_dimensions)] /
-					(order[findIndex('planned_rate', order_dimensions)] * 60)
+        const duration = order[findIndex('order_qty', orderDimensions)] / (order[findIndex('planned_rate', orderDimensions)] * 60)
         const _endTime = _startTime.add(duration, 'hours')
 
         // handle changeover
-        let changeoverDuration = order[findIndex('planned_changeover_time', order_dimensions)]
+        let changeoverDuration = order[findIndex('planned_changeover_time', orderDimensions)]
         if (changeoverDuration !== '0:00:00') {
           // if the order has changeover time
           changeoverDuration = moment.duration(changeoverDuration)
           const changeover = utils.copyObject(order)
-          changeover[findIndex('startTime', order_dimensions)] = currentStartTime // changeover's start time = current start time
-          changeover[findIndex('endTime', order_dimensions)] = moment(currentStartTime)
+          changeover[findIndex('startTime', orderDimensions)] = currentStartTime // changeover's start time = current start time
+          changeover[findIndex('endTime', orderDimensions)] = moment(currentStartTime)
             .add(changeoverDuration)
             .valueOf() // changeover's end time = main order's start time
-          changeover[findIndex('status', order_dimensions)] = cons.STATE_CHANGEOVER // set statuts to be changeover
+          changeover[findIndex('status', orderDimensions)] = cons.STATE_CHANGEOVER // set statuts to be changeover
 
-          order_data.push(changeover)
+          orderData.push(changeover)
 
           // update the order's startTime and endTime
-          order[findIndex('startTime', order_dimensions)] = moment(currentStartTime)
-            .add(changeover_duration)
+          order[findIndex('startTime', orderDimensions)] = moment(currentStartTime)
+            .add(changeoverDuration)
             .valueOf()
-          order[findIndex('endTime', order_dimensions)] = _endTime.add(changeover_duration).valueOf()
+          order[findIndex('endTime', orderDimensions)] = _endTime.add(changeoverDuration).valueOf()
         } else {
           // update the order's startTime and endTime
-          order[findIndex('startTime', order_dimensions)] = currentStartTime
-          order[findIndex('endTime', order_dimensions)] = _endTime.valueOf()
+          order[findIndex('startTime', orderDimensions)] = currentStartTime
+          order[findIndex('endTime', orderDimensions)] = _endTime.valueOf()
         }
 
         // update each order to the database
-        const line = writeLine(utils.mergeKeyVal(order, order_dimensions))
+        const line = writeLine(utils.mergeKeyVal(order, orderDimensions))
         promises.push(utils.post(influxUrl, line))
       }
     }
@@ -204,21 +199,21 @@ function tailorData (data, rowCols) {
   }
 
   // set order data and its dimension global because it will be required later from other files
-  _order_data = order_data
-  _order_dimensions = order_dimensions
+  _orderData = orderData
+  _orderDimensions = orderDimensions
 
   // Echart automatically convert number String to Int, so need to add some extra non-num String to avoid this
   // Will need to String.replace('###', '') when use it
-  order_data.forEach((e) => {
-    const product_id_api = e[findIndex('product_id', order_dimensions)] + '###'
-    e.push(product_id_api)
+  orderData.forEach((e) => {
+    const productIdApi = e[findIndex('product_id', orderDimensions)] + '###'
+    e.push(productIdApi)
   })
-  order_dimensions.push('product_id_api')
+  orderDimensions.push('product_id_api')
 
   // return the expect option data
   return {
-    order: { data: order_data, dimensions: order_dimensions },
-    line: { data: line_data, dimensions: line_dimensions }
+    order: { data: orderData, dimensions: orderDimensions },
+    line: { data: lineData, dimensions: lineDimensions }
   }
 }
 
@@ -342,6 +337,6 @@ export function getColor (status) {
 
 export function getData () {
   return utils
-    .mergeKeyArrayVal(_order_data, _order_dimensions)
+    .mergeKeyArrayVal(_orderData, _orderDimensions)
     .filter((order) => order.status.toLowerCase() !== cons.STATE_CHANGEOVER)
 }

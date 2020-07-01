@@ -186,7 +186,6 @@ function updateOrder (inputValues) {
   }
 
   updateOldAndNewOrders(inputValues)
-
 }
 
 /**

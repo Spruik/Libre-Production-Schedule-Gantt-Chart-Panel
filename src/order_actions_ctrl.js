@@ -1,7 +1,7 @@
 import * as utils from './utils'
 import * as influx from './influx_helper'
-import * as insert_actions from './insertion_actions_ctrl'
-import * as edit_actions from './editing_actions_ctrl'
+import * as insertActions from './insertion_actions_ctrl'
+import * as editActions from './editing_actions_ctrl'
 import * as dp from './data_processor'
 import * as cons from './constans'
 import moment from 'moment'
@@ -71,7 +71,7 @@ async function insertOrder () {
   const result = await utils.sure(utils.get(url))
   if (result.ok) {
     _orderStates = result.data
-    insert_actions.showActions(_order)
+    insertActions.showActions(_order)
   } else {
     utils.alert(
       'error',
@@ -86,7 +86,7 @@ async function editOrder () {
   const result = await utils.sure(utils.get(url))
   if (result.ok) {
     _orderStates = result.data
-    edit_actions.showActions(_order)
+    editActions.showActions(_order)
   } else {
     utils.alert(
       'error',

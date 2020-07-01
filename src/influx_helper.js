@@ -1,5 +1,4 @@
 import * as utils from './utils'
-import * as cons from './constans'
 import moment from 'moment'
 
 export const writeUrl = utils.influxHost + 'write?db=smart_factory'

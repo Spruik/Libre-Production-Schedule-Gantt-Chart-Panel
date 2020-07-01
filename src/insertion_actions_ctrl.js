@@ -189,8 +189,8 @@ function insertOrder (inputValues, allData) {
 
   const ordersBeingAffected = ordersWithSameLine.filter((order) => {
     const startTime = moment(inputValues.startTime)
-    const changeover_dur = moment.duration(inputValues.changeover)
-    return order.startTime >= startTime.subtract(changeover_dur).valueOf() && order.order_date === inputValues.date
+    const changeoverDur = moment.duration(inputValues.changeover)
+    return order.startTime >= startTime.subtract(changeoverDur).valueOf() && order.order_date === inputValues.date
   })
 
   // calculate the total duration that the inserting order is taking, and then each affected order will be adding up with this total duarion later
