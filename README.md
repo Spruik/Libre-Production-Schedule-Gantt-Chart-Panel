@@ -62,7 +62,7 @@ WHERE $timeFilter
 GROUP BY "order_id", "product_id"
 ```
 
-![Metrics](./docs/libre-production-schedule-gantt-chart-panel-metrics.gif)
+![Metrics](./docs/libre-production-schedule-gantt-chart-panel-metrics.png)
 
 ### Editting
 
