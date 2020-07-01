@@ -63,9 +63,7 @@ function insert () {
     updateForLineChangedCase(originalLineAffectedOrders, targetingLineAffectedOrders, droppingTotalDuration)
   } else {
     if (isDateChanged(_droppingOrder, _targetOrder)) {
-      // ......
       updateForLineChangedCase(originalLineAffectedOrders, targetingLineAffectedOrders, droppingTotalDuration)
-      // ......
     } else {
       // line didn't change
       // need to know if the dragging order is moving forward or backward
@@ -81,13 +79,7 @@ function insert () {
       if (ordersAffected.length === 0) {
         if (_droppingOrder.order_date === _targetOrder.order_date) {
           const dir = _isInsertingBefore ? 'before ' : 'after '
-          const text =
-						'Order ' +
-						_droppingOrder.order_id +
-						' is already ' +
-						dir +
-						'the order ' +
-						_targetOrder.order_id
+          const text = 'Order ' + _droppingOrder.order_id + ' is already ' + dir + 'the order ' + _targetOrder.order_id
           utils.alert('warning', 'Warning', text)
           return
         }
@@ -368,8 +360,8 @@ function isLineHavingSpareTimeForTheDay (allData, droppingTotalDuration, targetO
     (order) => order.production_line === targetOrder.production_line && order.order_date === targetOrder.order_date
   )
   // get the max end time
-  const all_end_times = affectedOrders.map((order) => order.endTime)
-  const maxEndTime = moment(Math.max(...all_end_times))
+  const allEndTimes = affectedOrders.map((order) => order.endTime)
+  const maxEndTime = moment(Math.max(...allEndTimes))
   // find the line's default start time and then plus next day
   const targetDay = moment(targetOrder.order_date, 'YYYY-MM-DD')
   const nextDay = targetDay.add(1, 'days').format('YYYY-MM-DD')

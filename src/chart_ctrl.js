@@ -67,15 +67,13 @@ export class ChartCtrl extends MetricsPanelCtrl {
     return super.issueQueries(datasource)
   }
 
-  onDataError (err) {
+  onDataError () {
     this.dataRaw = []
     this.render()
   }
 
   onDataReceived (dataList) {
-    // console.log('o', utils.copyObject(dataList))
     if (dataList.length === 0 || dataList === null || dataList === undefined) {
-      // console.log('No data reveived')
       this.hasData = false
       return
     }
@@ -136,7 +134,6 @@ export class ChartCtrl extends MetricsPanelCtrl {
       }
     })
     dataList[0].rows = rows
-    // console.log('d', dataList)
     return dataList
   }
 
@@ -154,7 +151,6 @@ export class ChartCtrl extends MetricsPanelCtrl {
         return
       }
       const option = chart.getOption(data, _ctrl.timeSrv)
-      // myChart.clear();
       myChart.setOption(option)
       setTimeout(() => {
         $('#production-schedule-gantt-chart').height(ctrl.height - 51)

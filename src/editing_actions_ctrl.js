@@ -185,26 +185,8 @@ function updateOrder (inputValues) {
     return
   }
 
-  // if (isTagsChanged(inputValues)) {
-
   updateOldAndNewOrders(inputValues)
 
-  // }else {
-  //   //in here, check if the line has changed, if yes, meaning that the order is going to another line
-  //   //so also update all affectingOrders(orders that are in the original line and that are after this order)
-  //   if (isLineChanged(inputValues)) {
-  //     //save the order directly with removing its starttime and endtime to let the initialiser to init it again
-  //     //coz it is changing line, so just simply remove the start time and end time
-  //     updateWithRemoving(inputValues)
-  //   }else{
-  //     if (isDateChanged(inputValues)) {
-  //       updateWithRemoving(inputValues)
-  //     }else{
-  //       //save the order directly with changing its starttime and endtime
-  //       updateWithChanging(inputValues)
-  //     }
-  //   }
-  // }
 }
 
 /**
@@ -277,8 +259,8 @@ function isLineHavingSpareTimeForTheDay (allData, inputValues, targetOrder) {
   }
 
   // get the max end time
-  const all_end_times = affectedOrders.map(order => order.endTime)
-  const maxEndTime = moment(Math.max(...all_end_times))
+  const allEndTimes = affectedOrders.map(order => order.endTime)
+  const maxEndTime = moment(Math.max(...allEndTimes))
   maxEndTime.add(totalDur)
 
   return maxEndTime.isSameOrBefore(nextDayStartTime)
@@ -413,14 +395,12 @@ function updateAffectedOrders (inputValues, difference) {
  * @param {*} inputValues User input for the form
  */
 function getDiff (inputValues) {
-  let diff
   const duration = moment.duration(
     inputValues.orderQty / (inputValues.plannedRate * 60),
     'hours'
   )
   const changeover = moment.duration(inputValues.changeover, 'H:mm:ss')
-  diff = duration.add(changeover)
-  return diff
+  return duration.add(changeover)
 }
 
 function updateOldAndNewOrders (inputValues) {
@@ -463,13 +443,13 @@ function isDateChanged (inputValues) {
  * @param {*} inputValues The users input for this form editing
  */
 function isTagsChanged (inputValues) {
-  const product_id = inputValues.product.split(' | ')[0]
-  const product_desc = inputValues.product.split(' | ')[1]
+  const productId = inputValues.product.split(' | ')[0]
+  const productDesc = inputValues.product.split(' | ')[1]
 
   return (
     _targetOrder.order_id !== inputValues.orderId ||
-    _targetOrder.product_id !== product_id ||
-    _targetOrder.product_desc !== product_desc
+    _targetOrder.product_id !== productId ||
+    _targetOrder.product_desc !== productDesc
   )
 }
 

@@ -127,8 +127,7 @@ export function getLineStartTime (line) {
  * Then execute the callback funtion when finished.
  */
 export function queryProductionLineDetails (callback) {
-  const url =
-		postgRestHost + 'equipment?site=not.is.null&area=not.is.null&production_line=not.is.null&equipment=is.null'
+  const url = postgRestHost + 'equipment?site=not.is.null&area=not.is.null&production_line=not.is.null&equipment=is.null'
   get(url)
     .then((res) => {
       _prodLineDetails = res

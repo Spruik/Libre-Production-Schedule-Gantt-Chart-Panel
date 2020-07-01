@@ -52,18 +52,16 @@ export function writeLineForUpdate (status, data) {
   line += 'order_qty=' + data.order_qty + ','
   line += 'planned_rate=' + data.planned_rate
 
-  // console.log('writeLineForUpdate');
-  // console.log(line);
   return line
 }
 
 export function writeLineForCreate (data, initState) {
-  const product_id = data.product.split(' | ')[0]
-  const product_desc = data.product.split(' | ')[1]
+  const productId = data.product.split(' | ')[0]
+  const productDesc = data.product.split(' | ')[1]
 
-  let line = writeTags(data.orderId, product_id)
+  let line = writeTags(data.orderId, productId)
   line += 'order_state="' + getRid(initState) + '"' + ','
-  line += 'product_desc="' + getRid(product_desc) + '"' + ','
+  line += 'product_desc="' + getRid(productDesc) + '"' + ','
   line += 'order_date="' + data.date + '"' + ','
   line += 'production_line="' + getRid(data.productionLine) + '"' + ','
   line += 'planned_changeover_time="' + data.changeover + '"' + ','
@@ -73,7 +71,6 @@ export function writeLineForCreate (data, initState) {
   line += 'setpoint_rate=' + 0 + ','
   line += 'planned_rate=' + data.plannedRate
 
-  // console.log(line);
   return line
 }
 
@@ -160,13 +157,13 @@ export function writeLineForTimeUpdate (data, timeDiff, action) {
 }
 
 export function writeLineForUpdateWithRemovingTime (data, currentStatus) {
-  const product_id = data.product.split(' | ')[0]
-  const product_desc = data.product.split(' | ')[1]
+  const productId = data.product.split(' | ')[0]
+  const productDesc = data.product.split(' | ')[1]
 
   // For influxdb tag keys, must add a forward slash \ before each space
   // product_desc = product_desc.split(' ').join('\\ ')
 
-  let line = writeTags(data.orderId, product_id)
+  let line = writeTags(data.orderId, productId)
   if (data.compl_qty !== null && data.compl_qty !== undefined) {
     line += 'compl_qty=' + data.compl_qty + ','
   }
@@ -189,16 +186,14 @@ export function writeLineForUpdateWithRemovingTime (data, currentStatus) {
     line += 'actual_end_datetime=' + data.actual_end_datetime + ','
   }
   line += 'order_state="' + getRid(currentStatus) + '"' + ','
-  line += 'product_desc="' + getRid(product_desc) + '"' + ','
+  line += 'product_desc="' + getRid(productDesc) + '"' + ','
   line += 'order_date="' + data.date + '"' + ','
   line += 'production_line="' + getRid(data.productionLine) + '"' + ','
   line += 'planned_changeover_time="' + data.changeover + '"' + ','
   line += 'order_qty=' + data.orderQty + ','
   line += 'setpoint_rate=' + 0 + ','
   line += 'planned_rate=' + data.plannedRate
-  // console.log('2');
-  // console.log('writeLineForUpdateWithRemovingTime');
-  // console.log(line);
+
   return line
 }
 
@@ -208,13 +203,12 @@ export function writeLineForUpdateWithChangingTime (
   startTime,
   endTime
 ) {
-  const product_id = data.product.split(' | ')[0]
-  const product_desc = data.product.split(' | ')[1]
+  const productId = data.product.split(' | ')[0]
+  const productDesc = data.product.split(' | ')[1]
 
   // For influxdb tag keys, must add a forward slash \ before each space
-  // product_desc = product_desc.split(' ').join('\\ ')
 
-  let line = writeTags(data.orderId, product_id)
+  let line = writeTags(data.orderId, productId)
   if (data.compl_qty !== null && data.compl_qty !== undefined) {
     line += 'compl_qty=' + data.compl_qty + ','
   }
@@ -237,7 +231,7 @@ export function writeLineForUpdateWithChangingTime (
     line += 'actual_end_datetime=' + data.actual_end_datetime + ','
   }
   line += 'order_state="' + getRid(currentStatus) + '"' + ','
-  line += 'product_desc="' + getRid(product_desc) + '"' + ','
+  line += 'product_desc="' + getRid(productDesc) + '"' + ','
   line += 'order_date="' + data.date + '"' + ','
   line += 'production_line="' + getRid(data.productionLine) + '"' + ','
   line += 'planned_changeover_time="' + data.changeover + '"' + ','
@@ -246,9 +240,7 @@ export function writeLineForUpdateWithChangingTime (
   line += 'order_qty=' + data.orderQty + ','
   line += 'setpoint_rate=' + 0 + ','
   line += 'planned_rate=' + data.plannedRate
-  // console.log('3');
-  // console.log('writeLineForUpdateWithChangingTime');
-  // console.log(line);
+
   return line
 }
 
@@ -288,13 +280,12 @@ export function writeLineForUpdateDragging (data, startTime, endTime, targLine) 
   line += 'scheduled_start_datetime=' + startTime + ','
   line += 'setpoint_rate=' + 0 + ','
   line += 'planned_rate=' + data.planned_rate
-  // console.log('writeLineForUpdateDragging');
-  // console.log(line);
+
   return line
 }
 
-function writeTags (order_id, prod_id) {
-  return `OrderPerformance,order_id=${order_id},product_id=${prod_id} `
+function writeTags (orderId, productId) {
+  return `OrderPerformance,order_id=${orderId},product_id=${productId} `
 }
 
 /**

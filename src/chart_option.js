@@ -1,6 +1,6 @@
 import * as dp from './data_processor'
 import * as utils from './utils'
-import * as order_actions from './order_actions_ctrl'
+import * as orderActions from './order_actions_ctrl'
 import * as dropCtrl from './drop_order_ctrl'
 import * as cons from './constans'
 
@@ -158,7 +158,7 @@ export function getOption (data, timeSrv) {
           formatter: params => {
             const startTime = moment(params.data[1]).format('YYYY-MM-DD H:mm:ss')
             const endTime = moment(params.data[2]).format('YYYY-MM-DD H:mm:ss')
-            const compl_qty = params.data[fi('compl_qty')] === null ? 0 : params.data[fi('compl_qty')]
+            const complQty = params.data[fi('compl_qty')] === null ? 0 : params.data[fi('compl_qty')]
 
             let tooltip = '<p style="text-align:center;margin:0px;color:#999">Order ID : ' + params.data[fi('order_id')] + '</p>'
             tooltip += '<div style="margin:5px 0px 5px 0px; width:100%; height:1px; background: #999"></div>'
@@ -168,7 +168,7 @@ export function getOption (data, timeSrv) {
               tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Product ID :</strong> &nbsp;' + params.data[fi('product_id')] + '</p> '
               tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Product Desc :</strong> &nbsp;' + params.data[fi('product_desc')] + '</p> '
               tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Planned Qty :</strong> &nbsp;' + params.data[fi('order_qty')] + '</p> '
-              tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Confirmed Qty :</strong> &nbsp;' + compl_qty + '</p> '
+              tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Confirmed Qty :</strong> &nbsp;' + complQty + '</p> '
             }
             tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Scheduled Start Time :</strong> &nbsp;' + startTime + '</p> '
             tooltip += '<p style="margin:0px;color:' + params.color + '"><strong style="font-size:medium">Scheduled End Time :</strong> &nbsp;' + endTime + '</p> '
@@ -336,8 +336,6 @@ function clipRectByRect (params, rect) {
   })
 }
 
-// --------------------------------------------
-
 function onDragSwitchClick (model, api, type) {
   _draggable = !_draggable
   _myChart.setOption({
@@ -370,7 +368,6 @@ export function refreshDashboard () {
 function initDrag (myChart) {
   _autoDataZoomAnimator = makeAnimator(dispatchDataZoom)
   myChart.on('mousedown', function (param) {
-    // console.log(param.event.offsetX);
     if (!_draggable || !param || param.seriesIndex === null) {
       return
     }
@@ -445,9 +442,7 @@ function initDrag (myChart) {
     if (itemData.cursorPositionX) {
       pointArrival[0] = itemData.cursorPositionX - 10
     }
-    var pointDeparture = myChart.convertToPixel('grid', [itemData.timeDeparture, itemData.categoryIndex])
 
-    // var barLength = pointDeparture[0] - pointArrival[0];
     var barLength = 20
 
     var barHeight = Math.abs(
@@ -617,7 +612,7 @@ function setListeners (myChart) {
   myChart.on('click', params => {
     if (!_draggable) {
       if (params.data[fi('status')] !== cons.STATE_CHANGEOVER) {
-        order_actions.showOrderActions(utils.mergeKeyVal(params.data, _rawData.order.dimensions))
+        orderActions.showOrderActions(utils.mergeKeyVal(params.data, _rawData.order.dimensions))
       }
     }
   })

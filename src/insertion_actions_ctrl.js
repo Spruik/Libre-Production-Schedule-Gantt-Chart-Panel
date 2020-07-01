@@ -156,13 +156,13 @@ function submitOrder (data) {
   const changeover = data[7].value
   const qty = data[1].value
   const rate = data[5].value
-  const order_duration = Number(parseFloat(qty).toFixed(2)) / Number((parseFloat(rate) * 60).toFixed(2))
+  const orderDuration = Number(parseFloat(qty).toFixed(2)) / Number((parseFloat(rate) * 60).toFixed(2))
   const startTime = moment(_isInsertingBefore ? calcStartTime(_targetOrder) : _targetOrder.endTime)
     .add(moment.duration(changeover))
     .valueOf()
   const endTime = moment(_isInsertingBefore ? calcStartTime(_targetOrder) : _targetOrder.endTime)
     .add(moment.duration(changeover))
-    .add(order_duration, 'hours')
+    .add(orderDuration, 'hours')
     .valueOf()
 
   const inputValues = {
@@ -316,8 +316,8 @@ function isLineHavingSpareTimeForTheDay (ordersAffected, insertingOrderDuration,
   // find the max value of affected orders' end time
   let maxEndTime
   if (ordersAffected.length !== 0) {
-    const all_end_times = ordersAffected.map((order) => order.endTime)
-    maxEndTime = moment(Math.max(...all_end_times))
+    const allEndTimes = ordersAffected.map((order) => order.endTime)
+    maxEndTime = moment(Math.max(...allEndTimes))
   } else {
     // if there is no affected orders, the target order's endtime is the maxtime
     maxEndTime = moment(targetOrderEndTime)
