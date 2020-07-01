@@ -18,6 +18,10 @@
       "small": "img/icn-table-panel.svg",
       "large": "img/icn-table-panel.svg"
     },
+    "screenshots": [
+      {"name": "Panel", "url":"public/plugins/libre-production-schedule-gantt-chart-panel/docs/libre-production-schedule-gantt-chart-panel.png"},
+      {"name": "Metric", "url":"public/plugins/libre-production-schedule-gantt-chart-panel/docs/libre-production-schedule-gantt-chart-panel-metrics.png"}
+    ],
     "version": "1.0.0",
     "updated": "2020-06-30"
   },
