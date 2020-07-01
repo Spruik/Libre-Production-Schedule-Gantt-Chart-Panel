@@ -91,7 +91,7 @@ export class ChartCtrl extends MetricsPanelCtrl {
     }
 
     if (dataList[0].type !== 'table') {
-      console.log('To show the pie chart, please format data as a TABLE in the Metrics Setting')
+      console.log('To show the gantt chart, please format data as a TABLE in the Metrics Setting')
       return
     }
 

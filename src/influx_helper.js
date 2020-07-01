@@ -152,7 +152,6 @@ export function writeLineForTimeUpdate (data, timeDiff, action) {
   line += 'scheduled_start_datetime=' + startTime + ','
   line += 'planned_rate=' + data.planned_rate
 
-  // console.log('writeLineForTimeUpdate');
   return line
 }
 

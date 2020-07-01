@@ -38,11 +38,9 @@ export const post = (url, line) => {
     function handleResponse () {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
-          // console.log('200');
           var res = JSON.parse(xhr.responseText)
           resolve(res)
         } else if (xhr.status === 204) {
-          // console.log('204');
           res = xhr.responseText
           resolve(res)
         } else {

@@ -88,7 +88,6 @@ function tailorData (data, rowCols) {
 
   // categorise the order_data, group by line, and in each lineGroup, group by date
   const categorisedOrders = categoriseByLineAndDate(order_data, 'array', data)
-  // console.log(categorisedOrders)
   const promises = []
   for (let i = 0; i < categorisedOrders.length; i++) {
     const lineGroup = categorisedOrders[i]
@@ -129,20 +128,18 @@ function tailorData (data, rowCols) {
         order[findIndex('startTime', order_dimensions)] = startTime
         order[findIndex('endTime', order_dimensions)] = endtime
 
-        let changeover_duration = order[findIndex('planned_changeover_time', order_dimensions)]
-        if (changeover_duration !== '0:00:00') {
+        let changeoverDuration = order[findIndex('planned_changeover_time', order_dimensions)]
+        if (changeoverDuration !== '0:00:00') {
           // if the order has changeover time
-          changeover_duration = moment.duration(changeover_duration)
-          const changeover_startTime = moment(startTime).subtract(changeover_duration)
+          changeoverDuration = moment.duration(changeoverDuration)
+          const changeoverStartTime = moment(startTime).subtract(changeoverDuration)
           const changeover = utils.copyObject(order)
           changeover[findIndex('endTime', order_dimensions)] = startTime // changeover's end time = main order's start time
-          changeover[findIndex('startTime', order_dimensions)] = changeover_startTime.valueOf() // changeover's start time = it's end time - it's changeover time
+          changeover[findIndex('startTime', order_dimensions)] = changeoverStartTime.valueOf() // changeover's start time = it's end time - it's changeover time
           changeover[findIndex('status', order_dimensions)] = cons.STATE_CHANGEOVER // set statuts to be changeover
           order_data.push(changeover)
         }
       }
-
-      // console.log(dateGroupWithoutTime)
 
       // loop thro the date group containing orders that are with NO time
       for (let o = 0; o < dateGroupWithoutTime.length; o++) {
@@ -164,16 +161,14 @@ function tailorData (data, rowCols) {
         const _endTime = _startTime.add(duration, 'hours')
 
         // handle changeover
-        let changeover_duration = order[findIndex('planned_changeover_time', order_dimensions)]
-        if (changeover_duration !== '0:00:00') {
+        let changeoverDuration = order[findIndex('planned_changeover_time', order_dimensions)]
+        if (changeoverDuration !== '0:00:00') {
           // if the order has changeover time
-          changeover_duration = moment.duration(changeover_duration)
+          changeoverDuration = moment.duration(changeoverDuration)
           const changeover = utils.copyObject(order)
-          // console.log('change_in', changeover)
-          // console.log('change_d_in', order_dimensions)
           changeover[findIndex('startTime', order_dimensions)] = currentStartTime // changeover's start time = current start time
           changeover[findIndex('endTime', order_dimensions)] = moment(currentStartTime)
-            .add(changeover_duration)
+            .add(changeoverDuration)
             .valueOf() // changeover's end time = main order's start time
           changeover[findIndex('status', order_dimensions)] = cons.STATE_CHANGEOVER // set statuts to be changeover
 
