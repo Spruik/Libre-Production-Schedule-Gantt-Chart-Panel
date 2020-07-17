@@ -1,6 +1,6 @@
 {
   "name": "libre-production-schedule-gantt-chart-panel",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Libre Gantt Chart Panel to visually schedule Production Orders on Lines",
   "repository": {
     "type": "git",

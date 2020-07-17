@@ -22,7 +22,7 @@
       {"name": "Panel", "url":"public/plugins/libre-production-schedule-gantt-chart-panel/docs/libre-production-schedule-gantt-chart-panel.png"},
       {"name": "Metric", "url":"public/plugins/libre-production-schedule-gantt-chart-panel/docs/libre-production-schedule-gantt-chart-panel-metrics.png"}
     ],
-    "version": "1.0.0",
+    "version": "1.0.1",
     "updated": "2020-06-30"
   },
   "dependencies": {

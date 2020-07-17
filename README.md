@@ -250,4 +250,8 @@ For any issue, there are fundamentally three ways an individual can contribute:
 
 ## Change log
 
+- 1.0.1 Documentation Update
+  - Fix subtitle & project path
+  - Remove unused grunt config
+
 - 1.0.0 Initial Public Release
